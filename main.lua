@@ -46,7 +46,7 @@ function loadMainScript(IsAdmin)
         getgenv().DesyncScriptCleanup = nil
     end
 
-    local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/lovecruitdev/lib/main/Library.lua"))()
+    local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/lovecruitdev/lib/main/Library.lua?t=" .. os.time()))()
     local ThemeManager = Library.ThemeManager
     local SaveManager = Library.SaveManager
 
