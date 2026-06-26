@@ -7,12 +7,13 @@ local success, err = pcall(function()
     if isfile("Library.lua") then
         Library = loadstring(readfile("Library.lua"))()
     else
-        error("Library.lua not found in workspace!")
+        -- Fallback to raw GitHub repo
+        Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/lovecruitdev/lib/main/Library.lua"))()
     end
 end)
 
 if not success or not Library then
-    warn("Failed to load Library locally: " .. tostring(err))
+    warn("Failed to load Library: " .. tostring(err))
     local absolutePathSuccess, lib = pcall(function()
         return loadstring(readfile("c:/Users/lovecruit/Downloads/scr/Library.lua"))()
     end)
