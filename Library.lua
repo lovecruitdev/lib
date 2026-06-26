@@ -19,10 +19,21 @@ local Library = {
         TextMuted = Color3.fromRGB(140, 140, 160),
         Border = Color3.fromRGB(30, 30, 42),
         BorderGlow = Color3.fromRGB(120, 85, 255),
-        Font = Enum.Font.Inter,
-        FontBold = Enum.Font.InterBold
+        Font = Enum.Font.SourceSans,
+        FontBold = Enum.Font.SourceSansBold
     }
 }
+
+pcall(function()
+    -- Check and apply premium fonts if supported by client engine
+    if pcall(function() return Enum.Font.Inter end) then
+        Library.Theme.Font = Enum.Font.Inter
+        Library.Theme.FontBold = Enum.Font.InterBold
+    elseif pcall(function() return Enum.Font.Gotham end) then
+        Library.Theme.Font = Enum.Font.Gotham
+        Library.Theme.FontBold = Enum.Font.GothamBold
+    end
+end)
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
