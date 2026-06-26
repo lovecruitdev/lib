@@ -1,6 +1,6 @@
 -- [[ PREMIUM OFFLINE ROBLOX UI LIBRARY (TOP-TIER EDITION) ]] --
 -- Fully offline, zero-dependency, ultra-sleek glassmorphic theme.
--- Includes sliding tab indicators, window minimization, searchable dropdowns, preset color pickers, and a performance watermark.
+-- Features sliding tab indicators, window minimization, searchable dropdowns, preset color pickers, stats watermark, and dynamic theme switching.
 
 local Library = {
     Options = {},
@@ -9,6 +9,7 @@ local Library = {
     RegistryMap = {},
     Unloaded = false,
     OnUnloadCallbacks = {},
+    AccentRegistry = {},
     Theme = {
         Background = Color3.fromRGB(12, 12, 18),
         Groupbox = Color3.fromRGB(18, 18, 26),
@@ -60,6 +61,45 @@ local function Tween(obj, duration, properties, style, direction)
     local t = TweenService:Create(obj, tweenInfo, properties)
     t:Play()
     return t
+end
+
+-- Dynamic Accent Color Registry
+local function RegisterAccent(instance, property, isGradient)
+    table.insert(Library.AccentRegistry, {
+        Instance = instance,
+        Property = property,
+        IsGradient = isGradient or false
+    })
+    return instance
+end
+
+function Library:UpdateTheme(newColor)
+    Library.Theme.Accent = newColor
+    local h, s, v = newColor:ToHSV()
+    local newGradient = Color3.fromHSV((h + 0.08) % 1, s, v)
+    Library.Theme.AccentGradient = newGradient
+    
+    for _, item in ipairs(Library.AccentRegistry) do
+        pcall(function()
+            if item.Instance and item.Instance.Parent then
+                if item.IsGradient then
+                    if item.Instance:IsA("UIGradient") then
+                        item.Instance.Color = ColorSequence.new(newColor, newGradient)
+                    end
+                else
+                    local isToggleTrack = item.Instance:GetAttribute("IsToggleTrack")
+                    if isToggleTrack then
+                        local isToggleActive = item.Instance:GetAttribute("Active")
+                        if isToggleActive then
+                            Tween(item.Instance, 0.2, {[item.Property] = newColor})
+                        end
+                    else
+                        Tween(item.Instance, 0.2, {[item.Property] = newColor})
+                    end
+                end
+            end
+        end)
+    end
 end
 
 -- Dragging logic
@@ -269,7 +309,6 @@ RunService.RenderStepped:Connect(function()
     local now = os.clock()
     table.insert(frameTimes, now)
     
-    -- Keep last 1 second of frames
     while frameTimes[1] and frameTimes[1] < now - 1 do
         table.remove(frameTimes, 1)
     end
@@ -313,6 +352,11 @@ function Library:CreateWindow(config)
     wStroke.Thickness = 1.2
     wStroke.Parent = WindowFrame
     
+    local wGrad = Instance.new("UIGradient")
+    wGrad.Color = ColorSequence.new(Library.Theme.Background, Color3.fromRGB(24, 24, 34))
+    wGrad.Rotation = 45
+    wGrad.Parent = WindowFrame
+    
     local grad = Instance.new("UIGradient")
     grad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Library.Theme.Border),
@@ -321,7 +365,6 @@ function Library:CreateWindow(config)
     })
     grad.Parent = wStroke
     
-    -- Drag handle & Top Bar
     local TopBar = Instance.new("Frame")
     TopBar.Size = UDim2.new(1, 0, 0, 40)
     TopBar.BackgroundTransparency = 1
@@ -340,7 +383,6 @@ function Library:CreateWindow(config)
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Parent = TopBar
     
-    -- Control Buttons (Minimize & Close)
     local ControlFrame = Instance.new("Frame")
     ControlFrame.Position = UDim2.new(1, -70, 0, 0)
     ControlFrame.Size = UDim2.new(0, 60, 1, 0)
@@ -380,7 +422,6 @@ function Library:CreateWindow(config)
     closeCorner.CornerRadius = UDim.new(0, 5)
     closeCorner.Parent = CloseButton
     
-    -- Minimization logic
     local Minimized = false
     MinButton.MouseButton1Click:Connect(function()
         Minimized = not Minimized
@@ -398,7 +439,6 @@ function Library:CreateWindow(config)
         Library:Unload()
     end)
     
-    -- Separator
     local Sep = Instance.new("Frame")
     Sep.Position = UDim2.new(0, 0, 1, -1)
     Sep.Size = UDim2.new(1, 0, 0, 1)
@@ -406,7 +446,6 @@ function Library:CreateWindow(config)
     Sep.BorderSizePixel = 0
     Sep.Parent = TopBar
     
-    -- Sidebar for Tabs
     local Sidebar = Instance.new("Frame")
     Sidebar.Position = UDim2.new(0, 0, 0, 40)
     Sidebar.Size = UDim2.new(0, 140, 1, -40)
@@ -421,19 +460,11 @@ function Library:CreateWindow(config)
     SideSep.BorderSizePixel = 0
     SideSep.Parent = Sidebar
     
-    local SideLayout = Instance.new("UIListLayout")
-    SideLayout.Padding = UDim.new(0, 4)
-    SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-    SideLayout.Parent = Sidebar
-    
-    local SidePadding = Instance.new("UIPadding")
-    SidePadding.PaddingTop = UDim.new(0, 10)
-    SidePadding.Parent = Sidebar
-    
-    -- Sliding Tab Indicator Behind buttons
+    -- Absolute positioned Tab Indicator
     local TabIndicator = Instance.new("Frame")
     TabIndicator.Size = UDim2.new(0.9, 0, 0, 32)
-    TabIndicator.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    TabIndicator.Position = UDim2.new(0.05, 0, 0, 10)
+    TabIndicator.BackgroundColor3 = Color3.fromRGB(22, 22, 32)
     TabIndicator.BorderSizePixel = 0
     TabIndicator.ZIndex = 1
     TabIndicator.Parent = Sidebar
@@ -446,12 +477,28 @@ function Library:CreateWindow(config)
     tiStroke.Color = Library.Theme.Accent
     tiStroke.Thickness = 1
     tiStroke.Parent = TabIndicator
+    RegisterAccent(tiStroke, "Color")
     
     local tiGrad = Instance.new("UIGradient")
     tiGrad.Color = ColorSequence.new(Library.Theme.Accent, Library.Theme.AccentGradient)
     tiGrad.Parent = tiStroke
+    RegisterAccent(tiGrad, "Color", true)
     
-    -- Content panels container
+    -- Sub-container for list layout to isolate Tab Buttons from TabIndicator
+    local ButtonHolder = Instance.new("Frame")
+    ButtonHolder.Size = UDim2.new(1, 0, 1, 0)
+    ButtonHolder.BackgroundTransparency = 1
+    ButtonHolder.Parent = Sidebar
+    
+    local SideLayout = Instance.new("UIListLayout")
+    SideLayout.Padding = UDim.new(0, 4)
+    SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    SideLayout.Parent = ButtonHolder
+    
+    local SidePadding = Instance.new("UIPadding")
+    SidePadding.PaddingTop = UDim.new(0, 10)
+    SidePadding.Parent = ButtonHolder
+    
     local Container = Instance.new("Frame")
     Container.Position = UDim2.new(0, 140, 0, 40)
     Container.Size = UDim2.new(1, -140, 1, -40)
@@ -472,8 +519,9 @@ function Library:CreateWindow(config)
         end
     end)
     
-    -- Tab implementation
     function Window:AddTab(tabName, icon)
+        local tabIndex = #Window.Tabs + 1
+        
         local TabButton = Instance.new("TextButton")
         TabButton.Size = UDim2.new(0.9, 0, 0, 32)
         TabButton.BackgroundTransparency = 1
@@ -484,7 +532,7 @@ function Library:CreateWindow(config)
         TabButton.TextSize = 13
         TabButton.TextXAlignment = Enum.TextXAlignment.Left
         TabButton.ZIndex = 2
-        TabButton.Parent = Sidebar
+        TabButton.Parent = ButtonHolder
         
         local TabPanel = Instance.new("Frame")
         TabPanel.Size = UDim2.new(1, 0, 1, 0)
@@ -542,15 +590,13 @@ function Library:CreateWindow(config)
             TabPanel.Visible = true
             CloseAllPopups()
             
-            -- Smoothly slide the tab background pill to the active button position
             Tween(TabIndicator, 0.2, {
-                Position = UDim2.new(TabButton.Position.X.Scale, TabButton.Position.X.Offset, TabButton.Position.Y.Scale, TabButton.Position.Y.Offset + 10)
+                Position = UDim2.new(0.05, 0, 0, 10 + (tabIndex - 1) * 36)
             })
         end
         
         TabButton.MouseButton1Click:Connect(Activate)
         
-        -- Delay slightly to let layout solve and align on first frame
         task.defer(function()
             if not Window.ActiveTab then Activate() end
         end)
@@ -584,6 +630,7 @@ function Library:CreateWindow(config)
             gbHeader.TextSize = 10
             gbHeader.TextXAlignment = Enum.TextXAlignment.Left
             gbHeader.Parent = gb
+            RegisterAccent(gbHeader, "TextColor3")
             
             local ContentArea = Instance.new("Frame")
             ContentArea.Position = UDim2.new(0, 10, 0, 26)
@@ -645,6 +692,8 @@ function Library:CreateWindow(config)
                 SwitchTrack.BorderSizePixel = 0
                 SwitchTrack.LayoutOrder = 100
                 SwitchTrack.Parent = RightControls
+                SwitchTrack:SetAttribute("IsToggleTrack", true)
+                RegisterAccent(SwitchTrack, "BackgroundColor3")
                 
                 local sCorner = Instance.new("UICorner")
                 sCorner.CornerRadius = UDim.new(1, 0)
@@ -666,6 +715,8 @@ function Library:CreateWindow(config)
                 local function SetState(val, skipCallback)
                     ToggleState = val
                     Library.Toggles[id] = { Value = val }
+                    SwitchTrack:SetAttribute("Active", val)
+                    
                     if not skipCallback then
                         pcall(callback, val)
                     end
@@ -796,7 +847,6 @@ function Library:CreateWindow(config)
                         popupStroke.Thickness = 1
                         popupStroke.Parent = PickerPopup
                         
-                        -- Preset Color Palettes (Top-Tier style)
                         local PresetsFrame = Instance.new("Frame")
                         PresetsFrame.Position = UDim2.new(0, 10, 0, 10)
                         PresetsFrame.Size = UDim2.new(1, -20, 0, 36)
@@ -896,7 +946,6 @@ function Library:CreateWindow(config)
                         CreateRGBSlider("G", g, function(val) g = val; Reevaluate() end)
                         CreateRGBSlider("B", b, function(val) b = val; Reevaluate() end)
                         
-                        -- Preset Color Buttons
                         local presets = {
                             Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 0, 255),
                             Color3.fromRGB(255, 255, 0), Color3.fromRGB(0, 255, 255), Color3.fromRGB(255, 0, 255),
@@ -985,6 +1034,7 @@ function Library:CreateWindow(config)
                 Fill.BackgroundColor3 = Library.Theme.Accent
                 Fill.BorderSizePixel = 0
                 Fill.Parent = Track
+                RegisterAccent(Fill, "BackgroundColor3")
                 
                 local fCorner = Instance.new("UICorner")
                 fCorner.CornerRadius = UDim.new(1, 0)
@@ -993,6 +1043,7 @@ function Library:CreateWindow(config)
                 local fGrad = Instance.new("UIGradient")
                 fGrad.Color = ColorSequence.new(Library.Theme.Accent, Library.Theme.AccentGradient)
                 fGrad.Parent = Fill
+                RegisterAccent(fGrad, "Color", true)
                 
                 local currentValue = default
                 
@@ -1167,7 +1218,6 @@ function Library:CreateWindow(config)
                     dpStroke.Thickness = 1
                     dpStroke.Parent = DropdownPopup
                     
-                    -- Search Bar at the top (Top-Tier style searchable dropdown)
                     local SearchBox = Instance.new("TextBox")
                     SearchBox.Size = UDim2.new(0.9, 0, 0, 22)
                     SearchBox.Position = UDim2.new(0.05, 0, 0, 6)
@@ -1241,7 +1291,6 @@ function Library:CreateWindow(config)
                         buttons[val] = btn
                     end
                     
-                    -- Dynamic filter logic
                     SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
                         local query = string.lower(SearchBox.Text)
                         local visibleCount = 0
@@ -1360,6 +1409,7 @@ function Library:CreateWindow(config)
                 btn.Font = Library.Theme.FontBold
                 btn.TextSize = 12
                 btn.Parent = ContentArea
+                RegisterAccent(btn, "BackgroundColor3")
                 
                 local bCorner = Instance.new("UICorner")
                 bCorner.CornerRadius = UDim.new(0, 5)
@@ -1368,6 +1418,7 @@ function Library:CreateWindow(config)
                 local bGrad = Instance.new("UIGradient")
                 bGrad.Color = ColorSequence.new(Library.Theme.Accent, Library.Theme.AccentGradient)
                 bGrad.Parent = btn
+                RegisterAccent(bGrad, "Color", true)
                 
                 btn.MouseButton1Click:Connect(function()
                     Tween(btn, 0.05, {Size = UDim2.new(0.98, 0, 0, 24)}).Completed:Connect(function()
@@ -1459,6 +1510,197 @@ function Library:CreateWindow(config)
                     return LabelObj
                 end
                 
+                function LabelObj:AddColorPicker(cpId, cpOptions)
+                    cpOptions = cpOptions or {}
+                    local cpDefault = cpOptions.Default or Color3.new(1, 1, 1)
+                    local cpCallback = cpOptions.Callback or function() end
+                    
+                    local RightControls = labelFrame:FindFirstChild("RightControls")
+                    if not RightControls then
+                        RightControls = Instance.new("Frame")
+                        RightControls.Name = "RightControls"
+                        RightControls.Size = UDim2.new(0.5, 0, 1, 0)
+                        RightControls.Position = UDim2.new(0.5, 0, 0, 0)
+                        RightControls.BackgroundTransparency = 1
+                        RightControls.Parent = labelFrame
+                        
+                        local RightLayout = Instance.new("UIListLayout")
+                        RightLayout.FillDirection = Enum.FillDirection.Horizontal
+                        RightLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+                        RightLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+                        RightLayout.Padding = UDim.new(0, 6)
+                        RightLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                        RightLayout.Parent = RightControls
+                    end
+                    
+                    local ColorBox = Instance.new("TextButton")
+                    ColorBox.Size = UDim2.new(0, 18, 0, 18)
+                    ColorBox.BackgroundColor3 = cpDefault
+                    ColorBox.Text = ""
+                    ColorBox.LayoutOrder = #RightControls:GetChildren()
+                    ColorBox.Parent = RightControls
+                    
+                    local cpCorner = Instance.new("UICorner")
+                    cpCorner.CornerRadius = UDim.new(0, 4)
+                    cpCorner.Parent = ColorBox
+                    
+                    local cpStroke = Instance.new("UIStroke")
+                    cpStroke.Color = Library.Theme.Border
+                    cpStroke.Thickness = 1
+                    cpStroke.Parent = ColorBox
+                    
+                    local currentColor = cpDefault
+                    Library.Options[cpId] = { Value = currentColor }
+                    
+                    ColorBox.MouseButton1Click:Connect(function()
+                        CloseAllPopups()
+                        
+                        local PickerPopup = Instance.new("Frame")
+                        PickerPopup.Size = UDim2.new(0, 170, 0, 180)
+                        PickerPopup.BackgroundColor3 = Library.Theme.Groupbox
+                        PickerPopup.Position = UDim2.new(0, ColorBox.AbsolutePosition.X - 180, 0, ColorBox.AbsolutePosition.Y)
+                        PickerPopup.Parent = Overlay
+                        
+                        local popupCorner = Instance.new("UICorner")
+                        popupCorner.CornerRadius = UDim.new(0, 6)
+                        popupCorner.Parent = PickerPopup
+                        
+                        local popupStroke = Instance.new("UIStroke")
+                        popupStroke.Color = Library.Theme.BorderGlow
+                        popupStroke.Thickness = 1
+                        popupStroke.Parent = PickerPopup
+                        
+                        local PresetsFrame = Instance.new("Frame")
+                        PresetsFrame.Position = UDim2.new(0, 10, 0, 10)
+                        PresetsFrame.Size = UDim2.new(1, -20, 0, 36)
+                        PresetsFrame.BackgroundTransparency = 1
+                        PresetsFrame.Parent = PickerPopup
+                        
+                        local PresetsLayout = Instance.new("UIGridLayout")
+                        PresetsLayout.CellSize = UDim2.new(0, 14, 0, 14)
+                        PresetsLayout.CellSpacing = UDim2.new(0, 5, 0, 5)
+                        PresetsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                        PresetsLayout.Parent = PresetsFrame
+                        
+                        local list = Instance.new("Frame")
+                        list.Size = UDim2.new(1, -20, 1, -56)
+                        list.Position = UDim2.new(0, 10, 0, 50)
+                        list.BackgroundTransparency = 1
+                        list.Parent = PickerPopup
+                        
+                        local listLayout = Instance.new("UIListLayout")
+                        listLayout.Padding = UDim.new(0, 6)
+                        listLayout.Parent = list
+                        
+                        local r, g, b = math.round(currentColor.R * 255), math.round(currentColor.G * 255), math.round(currentColor.B * 255)
+                        local sliders = {}
+                        
+                        local function Reevaluate()
+                            local newColor = Color3.fromRGB(r, g, b)
+                            currentColor = newColor
+                            ColorBox.BackgroundColor3 = newColor
+                            Library.Options[cpId] = { Value = newColor }
+                            pcall(cpCallback, newColor)
+                        end
+                        
+                        local function CreateRGBSlider(name, colorVal, changeCallback)
+                            local sFrame = Instance.new("Frame")
+                            sFrame.Size = UDim2.new(1, 0, 0, 22)
+                            sFrame.BackgroundTransparency = 1
+                            sFrame.Parent = list
+                            
+                            local sLabel = Instance.new("TextLabel")
+                            sLabel.Size = UDim2.new(0.2, 0, 1, 0)
+                            sLabel.BackgroundTransparency = 1
+                            sLabel.Text = name
+                            sLabel.TextColor3 = Library.Theme.TextMuted
+                            sLabel.Font = Library.Theme.Font
+                            sLabel.TextSize = 11
+                            sLabel.Parent = sFrame
+                            
+                            local track = Instance.new("TextButton")
+                            track.Size = UDim2.new(0.8, -5, 0, 8)
+                            track.Position = UDim2.new(0.2, 5, 0.5, -4)
+                            track.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+                            track.BorderSizePixel = 0
+                            track.Text = ""
+                            track.Parent = sFrame
+                            
+                            local fill = Instance.new("Frame")
+                            fill.Size = UDim2.new(colorVal / 255, 0, 1, 0)
+                            fill.BackgroundColor3 = Library.Theme.Accent
+                            fill.BorderSizePixel = 0
+                            fill.Parent = track
+                            
+                            local function Update(input)
+                                local pct = math.clamp((input.Position.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+                                fill.Size = UDim2.new(pct, 0, 1, 0)
+                                changeCallback(math.round(pct * 255))
+                            end
+                            
+                            local dragging = false
+                            track.InputBegan:Connect(function(input)
+                                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                    dragging = true
+                                    Update(input)
+                                end
+                            end)
+                            UserInputService.InputChanged:Connect(function(input)
+                                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                                    Update(input)
+                                end
+                            end)
+                            UserInputService.InputEnded:Connect(function(input)
+                                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                    dragging = false
+                                end
+                            end)
+                            
+                            sliders[name] = {
+                                Track = track,
+                                Fill = fill,
+                                UpdateValue = function(newVal)
+                                    fill.Size = UDim2.new(newVal / 255, 0, 1, 0)
+                                end
+                            }
+                        end
+                        
+                        CreateRGBSlider("R", r, function(val) r = val; Reevaluate() end)
+                        CreateRGBSlider("G", g, function(val) g = val; Reevaluate() end)
+                        CreateRGBSlider("B", b, function(val) b = val; Reevaluate() end)
+                        
+                        local presets = {
+                            Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 0, 255),
+                            Color3.fromRGB(255, 255, 0), Color3.fromRGB(0, 255, 255), Color3.fromRGB(255, 0, 255),
+                            Color3.fromRGB(255, 128, 0), Color3.fromRGB(128, 0, 255), Color3.fromRGB(255, 255, 255),
+                            Color3.fromRGB(128, 128, 128), Color3.fromRGB(30, 30, 30), Color3.fromRGB(0, 0, 0)
+                        }
+                        
+                        for i, color in ipairs(presets) do
+                            local pBtn = Instance.new("TextButton")
+                            pBtn.BackgroundColor3 = color
+                            pBtn.Text = ""
+                            pBtn.Parent = PresetsFrame
+                            
+                            local pCorner = Instance.new("UICorner")
+                            pCorner.CornerRadius = UDim.new(0, 3)
+                            pCorner.Parent = pBtn
+                            
+                            pBtn.MouseButton1Click:Connect(function()
+                                r = math.round(color.R * 255)
+                                g = math.round(color.G * 255)
+                                b = math.round(color.B * 255)
+                                sliders["R"].UpdateValue(r)
+                                sliders["G"].UpdateValue(g)
+                                sliders["B"].UpdateValue(b)
+                                Reevaluate()
+                            end)
+                        end
+                    end)
+                    
+                    return LabelObj
+                end
+                
                 return LabelObj
             end
             
@@ -1514,14 +1756,25 @@ Library.ThemeManager = {
     SetLibrary = function(_, lib) end,
     ApplyToTab = function(_, tab)
         local group = tab:AddLeftGroupbox("Theme settings")
+        
         group:AddLabel("Accent Color"):AddColorPicker("ThemeAccent", {
             Default = Library.Theme.Accent,
             Callback = function(color)
-                Library.Theme.Accent = color
+                Library:UpdateTheme(color)
             end
         })
+        
+        -- Compact color presets in a single label!
+        local label = group:AddLabel("Quick Themes")
+        label:AddColorPicker("Preset1", { Default = Color3.fromRGB(130, 90, 255), Callback = function() Library:UpdateTheme(Color3.fromRGB(130, 90, 255)) end })
+        label:AddColorPicker("Preset2", { Default = Color3.fromRGB(0, 220, 255), Callback = function() Library:UpdateTheme(Color3.fromRGB(0, 220, 255)) end })
+        label:AddColorPicker("Preset3", { Default = Color3.fromRGB(255, 60, 80), Callback = function() Library:UpdateTheme(Color3.fromRGB(255, 60, 80)) end })
+        label:AddColorPicker("Preset4", { Default = Color3.fromRGB(40, 220, 100), Callback = function() Library:UpdateTheme(Color3.fromRGB(40, 220, 100)) end })
+        label:AddColorPicker("Preset5", { Default = Color3.fromRGB(255, 140, 0), Callback = function() Library:UpdateTheme(Color3.fromRGB(255, 140, 0)) end })
+        label:AddColorPicker("Preset6", { Default = Color3.fromRGB(255, 100, 180), Callback = function() Library:UpdateTheme(Color3.fromRGB(255, 100, 180)) end })
+        
         group:AddButton("Reset Theme", function()
-            Library.Theme.Accent = Color3.fromRGB(130, 90, 255)
+            Library:UpdateTheme(Color3.fromRGB(130, 90, 255))
             Library:Notify("Theme reset to default!")
         end)
     end
