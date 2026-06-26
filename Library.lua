@@ -25,13 +25,21 @@ local Library = {
 }
 
 pcall(function()
-    -- Check and apply premium fonts if supported by client engine
-    if pcall(function() return Enum.Font.Inter end) then
-        Library.Theme.Font = Enum.Font.Inter
-        Library.Theme.FontBold = Enum.Font.InterBold
-    elseif pcall(function() return Enum.Font.Gotham end) then
-        Library.Theme.Font = Enum.Font.Gotham
-        Library.Theme.FontBold = Enum.Font.GothamBold
+    -- Dynamically lookup enums to bypass compile-time checks in older clients
+    local FontEnum = Enum.Font
+    local interExists, interFont = pcall(function() return FontEnum["Inter"] end)
+    local interBoldExists, interBoldFont = pcall(function() return FontEnum["InterBold"] end)
+    
+    if interExists and interFont and interBoldExists and interBoldFont then
+        Library.Theme.Font = interFont
+        Library.Theme.FontBold = interBoldFont
+    else
+        local gothamExists, gothamFont = pcall(function() return FontEnum["Gotham"] end)
+        local gothamBoldExists, gothamBoldFont = pcall(function() return FontEnum["GothamBold"] end)
+        if gothamExists and gothamFont and gothamBoldExists and gothamBoldFont then
+            Library.Theme.Font = gothamFont
+            Library.Theme.FontBold = gothamBoldFont
+        end
     end
 end)
 
