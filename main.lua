@@ -600,22 +600,27 @@ function loadMainScript(IsAdmin)
 
     -- [[ RAKNET HOOK ]] --
     if raknet then
-        raknetSendHook = raknet.add_send_hook(function(message)
-            if not getgenv().DesyncSettings or not getgenv().DesyncSettings.Desync then return end
-            if message.PacketId ~= 0x1B then return end
-            if message.Size < workingOffset + 4 then return end
+        local s, err = pcall(function()
+            raknetSendHook = raknet.add_send_hook(function(message)
+                if not getgenv().DesyncSettings or not getgenv().DesyncSettings.Desync then return end
+                if message.PacketId ~= 0x1B then return end
+                if message.Size < workingOffset + 4 then return end
 
-            local packetData = message.AsBuffer
+                local packetData = message.AsBuffer
 
-            if getgenv().DesyncSettings.Desync.Enabled then
-                local newBuf = buffer.create(message.Size)
-                buffer.copy(newBuf, 0, packetData, 0, message.Size)
-                buffer.writeu32(newBuf, workingOffset, getgenv().DesyncSettings.Desync.FrozenTick)
-                message:SetData(newBuf)
-            else
-                getgenv().DesyncSettings.Desync.FrozenTick = buffer.readu32(packetData, workingOffset)
-            end
+                if getgenv().DesyncSettings.Desync.Enabled then
+                    local newBuf = buffer.create(message.Size)
+                    buffer.copy(newBuf, 0, packetData, 0, message.Size)
+                    buffer.writeu32(newBuf, workingOffset, getgenv().DesyncSettings.Desync.FrozenTick)
+                    message:SetData(newBuf)
+                else
+                    getgenv().DesyncSettings.Desync.FrozenTick = buffer.readu32(packetData, workingOffset)
+                end
+            end)
         end)
+        if not s then
+            warn("Failed to initialize raknet hook (restricted by executor): " .. tostring(err))
+        end
     end
 
     -- [[ ESP RENDER ]] --

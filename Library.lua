@@ -19,8 +19,8 @@ local Library = {
         TextMuted = Color3.fromRGB(140, 140, 160),
         Border = Color3.fromRGB(30, 30, 42),
         BorderGlow = Color3.fromRGB(120, 85, 255),
-        Font = Enum.Font.GothamMedium,
-        FontBold = Enum.Font.GothamBold
+        Font = Enum.Font.Inter,
+        FontBold = Enum.Font.InterBold
     }
 }
 
@@ -460,29 +460,43 @@ function Library:CreateWindow(config)
     SideSep.BorderSizePixel = 0
     SideSep.Parent = Sidebar
     
-    -- Absolute positioned Tab Indicator
+    -- Absolute positioned Tab Indicator (VSCode / modern macOS sidebar style)
     local TabIndicator = Instance.new("Frame")
-    TabIndicator.Size = UDim2.new(0.9, 0, 0, 32)
-    TabIndicator.Position = UDim2.new(0.05, 0, 0, 10)
-    TabIndicator.BackgroundColor3 = Color3.fromRGB(22, 22, 32)
+    TabIndicator.Size = UDim2.new(1, 0, 0, 32)
+    TabIndicator.Position = UDim2.new(0, 0, 0, 10)
+    TabIndicator.BackgroundTransparency = 1
     TabIndicator.BorderSizePixel = 0
     TabIndicator.ZIndex = 1
     TabIndicator.Parent = Sidebar
     
-    local tiCorner = Instance.new("UICorner")
-    tiCorner.CornerRadius = UDim.new(0, 6)
-    tiCorner.Parent = TabIndicator
+    local tiHighlight = Instance.new("Frame")
+    tiHighlight.Size = UDim2.new(0.9, 0, 0.8, 0)
+    tiHighlight.Position = UDim2.new(0.05, 0, 0.1, 0)
+    tiHighlight.BackgroundColor3 = Color3.fromRGB(24, 24, 34)
+    tiHighlight.BackgroundTransparency = 0.4
+    tiHighlight.BorderSizePixel = 0
+    tiHighlight.Parent = TabIndicator
     
-    local tiStroke = Instance.new("UIStroke")
-    tiStroke.Color = Library.Theme.Accent
-    tiStroke.Thickness = 1
-    tiStroke.Parent = TabIndicator
-    RegisterAccent(tiStroke, "Color")
+    local tihCorner = Instance.new("UICorner")
+    tihCorner.CornerRadius = UDim.new(0, 6)
+    tihCorner.Parent = tiHighlight
     
-    local tiGrad = Instance.new("UIGradient")
-    tiGrad.Color = ColorSequence.new(Library.Theme.Accent, Library.Theme.AccentGradient)
-    tiGrad.Parent = tiStroke
-    RegisterAccent(tiGrad, "Color", true)
+    local tiLeftBar = Instance.new("Frame")
+    tiLeftBar.Size = UDim2.new(0, 3, 0, 18)
+    tiLeftBar.Position = UDim2.new(0.05, 0, 0.5, -9)
+    tiLeftBar.BackgroundColor3 = Library.Theme.Accent
+    tiLeftBar.BorderSizePixel = 0
+    tiLeftBar.Parent = TabIndicator
+    RegisterAccent(tiLeftBar, "BackgroundColor3")
+    
+    local tibCorner = Instance.new("UICorner")
+    tibCorner.CornerRadius = UDim.new(1, 0)
+    tibCorner.Parent = tiLeftBar
+    
+    local tiLeftBarGrad = Instance.new("UIGradient")
+    tiLeftBarGrad.Color = ColorSequence.new(Library.Theme.Accent, Library.Theme.AccentGradient)
+    tiLeftBarGrad.Parent = tiLeftBar
+    RegisterAccent(tiLeftBarGrad, "Color", true)
     
     -- Sub-container for list layout to isolate Tab Buttons from TabIndicator
     local ButtonHolder = Instance.new("Frame")
@@ -526,7 +540,7 @@ function Library:CreateWindow(config)
         TabButton.Size = UDim2.new(0.9, 0, 0, 32)
         TabButton.BackgroundTransparency = 1
         TabButton.BorderSizePixel = 0
-        TabButton.Text = "  " .. (icon and "• " or "") .. tabName
+        TabButton.Text = "      " .. tabName
         TabButton.TextColor3 = Library.Theme.TextMuted
         TabButton.Font = Library.Theme.Font
         TabButton.TextSize = 13
@@ -591,7 +605,7 @@ function Library:CreateWindow(config)
             CloseAllPopups()
             
             Tween(TabIndicator, 0.2, {
-                Position = UDim2.new(0.05, 0, 0, 10 + (tabIndex - 1) * 36)
+                Position = UDim2.new(0, 0, 0, 10 + (tabIndex - 1) * 36)
             })
         end
         
@@ -855,7 +869,7 @@ function Library:CreateWindow(config)
                         
                         local PresetsLayout = Instance.new("UIGridLayout")
                         PresetsLayout.CellSize = UDim2.new(0, 14, 0, 14)
-                        PresetsLayout.CellSpacing = UDim2.new(0, 5, 0, 5)
+                        PresetsLayout.CellPadding = UDim2.new(0, 5, 0, 5)
                         PresetsLayout.SortOrder = Enum.SortOrder.LayoutOrder
                         PresetsLayout.Parent = PresetsFrame
                         
@@ -1578,7 +1592,7 @@ function Library:CreateWindow(config)
                         
                         local PresetsLayout = Instance.new("UIGridLayout")
                         PresetsLayout.CellSize = UDim2.new(0, 14, 0, 14)
-                        PresetsLayout.CellSpacing = UDim2.new(0, 5, 0, 5)
+                        PresetsLayout.CellPadding = UDim2.new(0, 5, 0, 5)
                         PresetsLayout.SortOrder = Enum.SortOrder.LayoutOrder
                         PresetsLayout.Parent = PresetsFrame
                         
