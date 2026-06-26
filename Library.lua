@@ -1,6 +1,6 @@
--- [[ FATALITY.WIN ROBLOX UI LIBRARY PORT ]] --
--- Premium replica of the iconic Fatality.win CS:GO cheat GUI.
--- Features double-border fuchsia outline, dark indigo palette, checkboxes, and clean sliders.
+-- [[ ENHANCED AIMWARE.NET ROBLOX UI LIBRARY PORT ]] --
+-- Premium replica of the iconic Aimware CS:GO cheat GUI, enhanced for modern Roblox.
+-- Features double-border red outline, dark charcoal palette, uppercase titles with red accent dots, and sleek widgets.
 
 local Library = {
     Options = {},
@@ -11,13 +11,13 @@ local Library = {
     OnUnloadCallbacks = {},
     AccentRegistry = {},
     Theme = {
-        Background = Color3.fromRGB(18, 16, 26), -- Deep Indigo-Purple
-        Sidebar = Color3.fromRGB(14, 12, 20),    -- Dark Indigo-Black
-        Groupbox = Color3.fromRGB(24, 21, 35),   -- Dark Purple
-        Accent = Color3.fromRGB(218, 30, 89),    -- Fatality Fuchsia/Pink
+        Background = Color3.fromRGB(15, 15, 15),   -- Deep Charcoal Black
+        Sidebar = Color3.fromRGB(8, 8, 8),        -- Dark Charcoal-Black
+        Groupbox = Color3.fromRGB(22, 22, 22),     -- Slate Gray Card
+        Accent = Color3.fromRGB(220, 40, 60),      -- Premium Cherry Red
         Text = Color3.fromRGB(245, 245, 250),
-        TextMuted = Color3.fromRGB(130, 130, 150),
-        Border = Color3.fromRGB(36, 33, 53),     -- Medium Purple-Gray border
+        TextMuted = Color3.fromRGB(140, 140, 145),
+        Border = Color3.fromRGB(30, 30, 30),       -- Slate Gray Border
         Font = Enum.Font.SourceSans,
         FontBold = Enum.Font.SourceSansBold
     }
@@ -298,7 +298,7 @@ wmLabel.Size = UDim2.new(1, -16, 1, 0)
 wmLabel.Position = UDim2.new(0, 8, 0, 0)
 wmLabel.BackgroundTransparency = 1
 wmLabel.TextColor3 = Library.Theme.Text
-wmLabel.Text = "fatality.win | FPS: -- | Ping: --"
+wmLabel.Text = "aimware.net | FPS: -- | Ping: --"
 wmLabel.Font = Library.Theme.FontBold
 wmLabel.TextSize = 11
 wmLabel.TextXAlignment = Enum.TextXAlignment.Center
@@ -326,7 +326,7 @@ RunService.RenderStepped:Connect(function()
             ping = math.round(Players.LocalPlayer:GetNetworkPing() * 1000)
         end)
         local timeStr = os.date("%H:%M:%S")
-        wmLabel.Text = string.format("fatality.win | %s | FPS: %d | Ping: %dms", timeStr, fpsCount, ping)
+        wmLabel.Text = string.format("aimware.net | %s | FPS: %d | Ping: %dms", timeStr, fpsCount, ping)
     end
 end)
 
@@ -334,10 +334,10 @@ function Library:SetWatermarkVisibility(visible)
     WatermarkFrame.Visible = visible
 end
 
--- MainWindow construction (Fatality style double border)
+-- MainWindow construction (Aimware style double border)
 function Library:CreateWindow(config)
     config = config or {}
-    local titleText = config.Title or "fatality"
+    local titleText = config.Title or "aimware"
     
     local WindowFrame = Instance.new("Frame")
     WindowFrame.Size = UDim2.new(0, 560, 0, 420)
@@ -353,11 +353,11 @@ function Library:CreateWindow(config)
     
     -- Outer border (dark charcoal)
     local outerStroke = Instance.new("UIStroke")
-    outerStroke.Color = Color3.fromRGB(10, 8, 15)
+    outerStroke.Color = Color3.fromRGB(6, 6, 6)
     outerStroke.Thickness = 1.5
     outerStroke.Parent = WindowFrame
     
-    -- Inner border (fuchsia outline matching Fatality style)
+    -- Inner border (cherry-red outline matching Aimware style)
     local InnerBorder = Instance.new("Frame")
     InnerBorder.Size = UDim2.new(1, -2, 1, -2)
     InnerBorder.Position = UDim2.new(0, 1, 0, 1)
@@ -475,7 +475,7 @@ function Library:CreateWindow(config)
     local tiHighlight = Instance.new("Frame")
     tiHighlight.Size = UDim2.new(0.9, 0, 0.85, 0)
     tiHighlight.Position = UDim2.new(0.05, 0, 0.075, 0)
-    tiHighlight.BackgroundColor3 = Color3.fromRGB(24, 21, 35)
+    tiHighlight.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
     tiHighlight.BorderSizePixel = 0
     tiHighlight.Parent = TabIndicator
     
@@ -647,14 +647,15 @@ function Library:CreateWindow(config)
             gbHeader.Position = UDim2.new(0, 10, 0, 6)
             gbHeader.Size = UDim2.new(1, -20, 0, 16)
             gbHeader.BackgroundTransparency = 1
-            gbHeader.Text = title:upper()
+            gbHeader.RichText = true
+            gbHeader.Text = title:upper() .. '<font color="rgb(220,40,60)">.</font>'
             gbHeader.TextColor3 = Library.Theme.Text
             gbHeader.Font = Library.Theme.FontBold
             gbHeader.TextSize = 10
             gbHeader.TextXAlignment = Enum.TextXAlignment.Left
             gbHeader.Parent = gb
             
-            -- Fatality subtitle decorative accent line
+            -- Subtitle divider line (Aimware style separator)
             local headerLine = Instance.new("Frame")
             headerLine.Position = UDim2.new(0, 10, 0, 22)
             headerLine.Size = UDim2.new(1, -20, 0, 1)
@@ -719,7 +720,7 @@ function Library:CreateWindow(config)
                 -- Checkbox frame
                 local CheckboxFrame = Instance.new("Frame")
                 CheckboxFrame.Size = UDim2.new(0, 12, 0, 12)
-                CheckboxFrame.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                CheckboxFrame.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                 CheckboxFrame.BorderSizePixel = 0
                 CheckboxFrame.LayoutOrder = 100
                 CheckboxFrame.Parent = RightControls
@@ -731,7 +732,7 @@ function Library:CreateWindow(config)
                 cbCorner.Parent = CheckboxFrame
                 
                 local cbStroke = Instance.new("UIStroke")
-                cbStroke.Color = Color3.fromRGB(36, 33, 53)
+                cbStroke.Color = Color3.fromRGB(30, 30, 30)
                 cbStroke.Thickness = 1
                 cbStroke.Parent = CheckboxFrame
                 cbStroke:SetAttribute("IsToggle", true)
@@ -766,8 +767,8 @@ function Library:CreateWindow(config)
                         Tween(cbStroke, 0.1, {Color = Library.Theme.Accent})
                         Tween(CheckIndicator, 0.1, {Size = UDim2.new(0, 6, 0, 6)})
                     else
-                        Tween(CheckboxFrame, 0.1, {BackgroundColor3 = Color3.fromRGB(16, 14, 23)})
-                        Tween(cbStroke, 0.1, {Color = Color3.fromRGB(36, 33, 53)})
+                        Tween(CheckboxFrame, 0.1, {BackgroundColor3 = Color3.fromRGB(16, 16, 16)})
+                        Tween(cbStroke, 0.1, {Color = Color3.fromRGB(30, 30, 30)})
                         Tween(CheckIndicator, 0.1, {Size = UDim2.new(0, 0, 0, 0)})
                     end
                 end
@@ -789,7 +790,7 @@ function Library:CreateWindow(config)
                     
                     local KeybindButton = Instance.new("TextButton")
                     KeybindButton.Size = UDim2.new(0, 45, 0, 18)
-                    KeybindButton.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                    KeybindButton.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                     KeybindButton.Text = "[" .. kpDefault .. "]"
                     KeybindButton.TextColor3 = Library.Theme.TextMuted
                     KeybindButton.Font = Library.Theme.Font
@@ -945,7 +946,7 @@ function Library:CreateWindow(config)
                             local track = Instance.new("TextButton")
                             track.Size = UDim2.new(0.8, -5, 0, 6)
                             track.Position = UDim2.new(0.2, 5, 0.5, -3)
-                            track.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                            track.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                             track.BorderSizePixel = 0
                             track.Text = ""
                             track.Parent = sFrame
@@ -1086,7 +1087,7 @@ function Library:CreateWindow(config)
                 local Track = Instance.new("TextButton")
                 Track.Position = UDim2.new(0, 0, 0, 22)
                 Track.Size = UDim2.new(1, 0, 0, 6)
-                Track.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                Track.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                 Track.Text = ""
                 Track.BorderSizePixel = 0
                 Track.Parent = sliderFrame
@@ -1216,7 +1217,7 @@ function Library:CreateWindow(config)
                 local TriggerButton = Instance.new("TextButton")
                 TriggerButton.Position = UDim2.new(0, 0, 0, 20)
                 TriggerButton.Size = UDim2.new(1, 0, 0, 24)
-                TriggerButton.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                TriggerButton.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                 TriggerButton.Text = "  Select Option"
                 TriggerButton.TextColor3 = Library.Theme.TextMuted
                 TriggerButton.Font = Library.Theme.Font
@@ -1325,7 +1326,7 @@ function Library:CreateWindow(config)
                     local SearchBox = Instance.new("TextBox")
                     SearchBox.Size = UDim2.new(0.9, 0, 0, 22)
                     SearchBox.Position = UDim2.new(0.05, 0, 0, 6)
-                    SearchBox.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                    SearchBox.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                     SearchBox.PlaceholderText = "Search..."
                     SearchBox.PlaceholderColor3 = Library.Theme.TextMuted
                     SearchBox.TextColor3 = Library.Theme.Text
@@ -1366,7 +1367,7 @@ function Library:CreateWindow(config)
                     for _, val in ipairs(values) do
                         local btn = Instance.new("TextButton")
                         btn.Size = UDim2.new(0.95, 0, 0, 24)
-                        btn.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                        btn.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                         btn.BorderSizePixel = 0
                         btn.Font = Library.Theme.Font
                         btn.TextSize = 12
@@ -1386,11 +1387,11 @@ function Library:CreateWindow(config)
                             if multi then active = Selection[val] else active = (Selection == val) end
                             if active then
                                 btn.TextColor3 = Library.Theme.Accent
-                                btn.BackgroundColor3 = Color3.fromRGB(24, 21, 35)
+                                btn.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
                                 bStr.Color = Library.Theme.Accent
                             else
                                 btn.TextColor3 = Library.Theme.TextMuted
-                                btn.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                                btn.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                                 bStr.Color = Library.Theme.Border
                             end
                         end
@@ -1481,7 +1482,7 @@ function Library:CreateWindow(config)
                 local box = Instance.new("TextBox")
                 box.Position = UDim2.new(0, 0, 0, 20)
                 box.Size = UDim2.new(1, 0, 0, 24)
-                box.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                box.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                 box.Text = default
                 box.PlaceholderText = placeholder
                 box.TextColor3 = Library.Theme.Text
@@ -1532,7 +1533,7 @@ function Library:CreateWindow(config)
                 
                 local btn = Instance.new("TextButton")
                 btn.Size = UDim2.new(1, 0, 0, 26)
-                btn.BackgroundColor3 = Color3.fromRGB(29, 27, 47)
+                btn.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
                 btn.BorderSizePixel = 0
                 btn.Text = text
                 btn.TextColor3 = Library.Theme.Text
@@ -1545,7 +1546,7 @@ function Library:CreateWindow(config)
                 bCorner.Parent = btn
                 
                 local bStroke = Instance.new("UIStroke")
-                bStroke.Color = Color3.fromRGB(48, 45, 75)
+                bStroke.Color = Color3.fromRGB(45, 45, 45)
                 bStroke.Thickness = 1
                 bStroke.Parent = btn
                 
@@ -1553,7 +1554,7 @@ function Library:CreateWindow(config)
                     Tween(bStroke, 0.1, {Color = Library.Theme.Accent})
                 end)
                 btn.MouseLeave:Connect(function()
-                    Tween(bStroke, 0.1, {Color = Color3.fromRGB(48, 45, 75)})
+                    Tween(bStroke, 0.1, {Color = Color3.fromRGB(45, 45, 45)})
                 end)
                 
                 btn.MouseButton1Click:Connect(function()
@@ -1595,7 +1596,7 @@ function Library:CreateWindow(config)
                     local KeybindButton = Instance.new("TextButton")
                     KeybindButton.Position = UDim2.new(1, -45, 0.5, -9)
                     KeybindButton.Size = UDim2.new(0, 45, 0, 18)
-                    KeybindButton.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                    KeybindButton.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                     KeybindButton.Text = "[" .. kpDefault .. "]"
                     KeybindButton.TextColor3 = Library.Theme.TextMuted
                     KeybindButton.Font = Library.Theme.Font
@@ -1762,7 +1763,7 @@ function Library:CreateWindow(config)
                             local track = Instance.new("TextButton")
                             track.Size = UDim2.new(0.8, -5, 0, 6)
                             track.Position = UDim2.new(0.2, 5, 0.5, -3)
-                            track.BackgroundColor3 = Color3.fromRGB(16, 14, 23)
+                            track.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
                             track.BorderSizePixel = 0
                             track.Text = ""
                             track.Parent = sFrame
@@ -1925,18 +1926,18 @@ Library.ThemeManager = {
         
         -- High-end theme presets
         local presets = {
-            ["Fatality Fuchsia"] = Color3.fromRGB(218, 30, 89),
+            ["Cherry Red"] = Color3.fromRGB(220, 40, 60),
             ["Electric Mint"] = Color3.fromRGB(0, 220, 140),
             ["Royal Blue"] = Color3.fromRGB(85, 110, 250),
-            ["Crimson Red"] = Color3.fromRGB(255, 75, 75),
+            ["Crimson Red"] = Color3.fromRGB(255, 50, 70),
             ["Vibrant Orange"] = Color3.fromRGB(255, 135, 0),
             ["Orchid Purple"] = Color3.fromRGB(180, 90, 255)
         }
         
         group:AddDropdown("ThemePreset", {
             Text = "Quick Theme Presets",
-            Values = {"Fatality Fuchsia", "Electric Mint", "Royal Blue", "Crimson Red", "Vibrant Orange", "Orchid Purple"},
-            Default = "Fatality Fuchsia",
+            Values = {"Cherry Red", "Electric Mint", "Royal Blue", "Crimson Red", "Vibrant Orange", "Orchid Purple"},
+            Default = "Cherry Red",
             Callback = function(val)
                 local color = presets[val]
                 if color then
@@ -1946,8 +1947,8 @@ Library.ThemeManager = {
         })
         
         group:AddButton("Reset Theme", function()
-            Library:UpdateTheme(Color3.fromRGB(218, 30, 89))
-            Library:Notify("Theme reset to Fatality Fuchsia!")
+            Library:UpdateTheme(Color3.fromRGB(220, 40, 60))
+            Library:Notify("Theme reset to Cherry Red!")
         end)
     end
 }
