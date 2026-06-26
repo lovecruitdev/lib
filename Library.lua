@@ -1,6 +1,6 @@
--- [[ ENHANCED AIMWARE.NET ROBLOX UI LIBRARY PORT ]] --
--- Premium replica of the iconic Aimware CS:GO cheat GUI, enhanced for modern Roblox.
--- Features double-border red outline, dark charcoal palette, uppercase titles with red accent dots, and sleek widgets.
+-- [[ ENHANCED AIMWARE.NET V5 ROBLOX UI LIBRARY PORT ]] --
+-- Premium replica of the iconic Aimware V5 CS:GO cheat GUI.
+-- Features horizontal top-tabs, dynamic underline indicator, double-border red outline, and dark charcoal palette.
 
 local Library = {
     Options = {},
@@ -12,7 +12,7 @@ local Library = {
     AccentRegistry = {},
     Theme = {
         Background = Color3.fromRGB(15, 15, 15),   -- Deep Charcoal Black
-        Sidebar = Color3.fromRGB(8, 8, 8),        -- Dark Charcoal-Black
+        Sidebar = Color3.fromRGB(8, 8, 8),        -- Dark Charcoal-Black for TabBar
         Groupbox = Color3.fromRGB(22, 22, 22),     -- Slate Gray Card
         Accent = Color3.fromRGB(220, 40, 60),      -- Premium Cherry Red
         Text = Color3.fromRGB(245, 245, 250),
@@ -393,7 +393,7 @@ function Library:CreateWindow(config)
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Parent = TopBar
     
-    -- macOS style close/min buttons
+    -- Close and Minimize buttons
     local ControlFrame = Instance.new("Frame")
     ControlFrame.Position = UDim2.new(1, -55, 0, 0)
     ControlFrame.Size = UDim2.new(0, 45, 1, 0)
@@ -449,70 +449,51 @@ function Library:CreateWindow(config)
     Sep.BorderSizePixel = 0
     Sep.Parent = TopBar
     
-    local Sidebar = Instance.new("Frame")
-    Sidebar.Position = UDim2.new(0, 0, 0, 38)
-    Sidebar.Size = UDim2.new(0, 135, 1, -38)
-    Sidebar.BackgroundColor3 = Library.Theme.Sidebar
-    Sidebar.BorderSizePixel = 0
-    Sidebar.Parent = WindowFrame
+    -- Horizontal TabBar positioned at the top of the interface
+    local TabBar = Instance.new("Frame")
+    TabBar.Position = UDim2.new(0, 0, 0, 38)
+    TabBar.Size = UDim2.new(1, 0, 0, 34)
+    TabBar.BackgroundColor3 = Library.Theme.Sidebar
+    TabBar.BorderSizePixel = 0
+    TabBar.Parent = WindowFrame
     
-    local SideSep = Instance.new("Frame")
-    SideSep.Position = UDim2.new(1, -1, 0, 0)
-    SideSep.Size = UDim2.new(0, 1, 1, 0)
-    SideSep.BackgroundColor3 = Library.Theme.Border
-    SideSep.BorderSizePixel = 0
-    SideSep.Parent = Sidebar
+    local TabSep = Instance.new("Frame")
+    TabSep.Position = UDim2.new(0, 0, 1, -1)
+    TabSep.Size = UDim2.new(1, 0, 0, 1)
+    TabSep.BackgroundColor3 = Library.Theme.Border
+    TabSep.BorderSizePixel = 0
+    TabSep.Parent = TabBar
     
-    -- Active Tab highlight bar
+    -- Accent colored horizontal underline active tab indicator
     local TabIndicator = Instance.new("Frame")
-    TabIndicator.Size = UDim2.new(1, 0, 0, 34)
-    TabIndicator.Position = UDim2.new(0, 0, 0, 10)
-    TabIndicator.BackgroundTransparency = 1
+    TabIndicator.Size = UDim2.new(0, 80, 0, 2)
+    TabIndicator.Position = UDim2.new(0, 10, 1, -2)
+    TabIndicator.BackgroundColor3 = Library.Theme.Accent
     TabIndicator.BorderSizePixel = 0
-    TabIndicator.ZIndex = 1
-    TabIndicator.Parent = Sidebar
+    TabIndicator.ZIndex = 2
+    TabIndicator.Parent = TabBar
+    RegisterAccent(TabIndicator, "BackgroundColor3")
     
-    local tiHighlight = Instance.new("Frame")
-    tiHighlight.Size = UDim2.new(0.9, 0, 0.85, 0)
-    tiHighlight.Position = UDim2.new(0.05, 0, 0.075, 0)
-    tiHighlight.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-    tiHighlight.BorderSizePixel = 0
-    tiHighlight.Parent = TabIndicator
-    
-    local tihCorner = Instance.new("UICorner")
-    tihCorner.CornerRadius = UDim.new(0, 5)
-    tihCorner.Parent = tiHighlight
-    
-    local tiLeftBar = Instance.new("Frame")
-    tiLeftBar.Size = UDim2.new(0, 3, 0, 16)
-    tiLeftBar.Position = UDim2.new(0.05, 0, 0.5, -8)
-    tiLeftBar.BackgroundColor3 = Library.Theme.Accent
-    tiLeftBar.BorderSizePixel = 0
-    tiLeftBar.Parent = TabIndicator
-    RegisterAccent(tiLeftBar, "BackgroundColor3")
-    
-    local tibCorner = Instance.new("UICorner")
-    tibCorner.CornerRadius = UDim.new(1, 0)
-    tibCorner.Parent = tiLeftBar
-    
-    -- Sub-container for list layout to isolate Tab Buttons from TabIndicator
     local ButtonHolder = Instance.new("Frame")
     ButtonHolder.Size = UDim2.new(1, 0, 1, 0)
     ButtonHolder.BackgroundTransparency = 1
-    ButtonHolder.Parent = Sidebar
+    ButtonHolder.Parent = TabBar
     
     local SideLayout = Instance.new("UIListLayout")
-    SideLayout.Padding = UDim.new(0, 4)
-    SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    SideLayout.FillDirection = Enum.FillDirection.Horizontal
+    SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    SideLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    SideLayout.Padding = UDim.new(0, 6)
     SideLayout.Parent = ButtonHolder
     
     local SidePadding = Instance.new("UIPadding")
-    SidePadding.PaddingTop = UDim.new(0, 10)
+    SidePadding.PaddingLeft = UDim.new(0, 10)
     SidePadding.Parent = ButtonHolder
     
+    -- Full width container starting below the top TabBar
     local Container = Instance.new("Frame")
-    Container.Position = UDim2.new(0, 135, 0, 38)
-    Container.Size = UDim2.new(1, -135, 1, -38)
+    Container.Position = UDim2.new(0, 0, 0, 72)
+    Container.Size = UDim2.new(1, 0, 1, -72)
     Container.BackgroundTransparency = 1
     Container.Parent = WindowFrame
     
@@ -534,14 +515,13 @@ function Library:CreateWindow(config)
         local tabIndex = #Window.Tabs + 1
         
         local TabButton = Instance.new("TextButton")
-        TabButton.Size = UDim2.new(0.9, 0, 0, 34)
+        TabButton.Size = UDim2.new(0, 80, 1, 0)
         TabButton.BackgroundTransparency = 1
         TabButton.BorderSizePixel = 0
-        TabButton.Text = "      " .. tabName
+        TabButton.Text = tabName
         TabButton.TextColor3 = Library.Theme.TextMuted
-        TabButton.Font = Library.Theme.Font
+        TabButton.Font = Library.Theme.FontBold
         TabButton.TextSize = 12
-        TabButton.TextXAlignment = Enum.TextXAlignment.Left
         TabButton.ZIndex = 2
         TabButton.Parent = ButtonHolder
         
@@ -613,8 +593,9 @@ function Library:CreateWindow(config)
             TabPanel.Visible = true
             CloseAllPopups()
             
+            -- Horizontal tab indicator tween matching the button positions
             Tween(TabIndicator, 0.2, {
-                Position = UDim2.new(0, 0, 0, 10 + (tabIndex - 1) * 38)
+                Position = UDim2.new(0, 10 + (tabIndex - 1) * 86, 1, -2)
             })
         end
         
@@ -837,7 +818,7 @@ function Library:CreateWindow(config)
                         if binding and not processed then
                             binding = false
                             if input.UserInputType == Enum.UserInputType.Keyboard then
-                                local key = input.KeyCode.Name
+                                	local key = input.KeyCode.Name
                                 if input.KeyCode == Enum.KeyCode.Escape then
                                     SetBind("None")
                                 else
