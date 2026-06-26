@@ -1,6 +1,6 @@
--- [[ MIDNIGHT.IM ROBLOX UI LIBRARY PORT ]] --
--- Premium replica of the elegant, dark glassmorphic Midnight.im CS:GO/CS2 cheat menu.
--- Features icons-only vertical sidebar, clean cyan accenting, rounded checkboxes, and minimal sliders.
+-- [[ AIMWARE.NET ROBLOX UI LIBRARY PORT ]] --
+-- Premium replica of the classic, dark red retro Aimware v5 cheat menu.
+-- Features wide vertical sidebar, bold red accenting, and sharp square corners.
 
 local Library = {
     Options = {},
@@ -11,19 +11,19 @@ local Library = {
     OnUnloadCallbacks = {},
     AccentRegistry = {},
     Theme = {
-        Background = Color3.fromRGB(16, 16, 20),   -- Rich Dark Blue-Gray
-        Sidebar = Color3.fromRGB(12, 12, 15),      -- Dark Indigo-Black
-        Groupbox = Color3.fromRGB(22, 22, 28),     -- Slate Gray Card
-        Accent = Color3.fromRGB(0, 180, 255),      -- Midnight Cyan
-        Text = Color3.fromRGB(245, 245, 250),
-        TextMuted = Color3.fromRGB(140, 140, 150),
-        Border = Color3.fromRGB(28, 28, 35),       -- Slate Border
+        Background = Color3.fromRGB(12, 12, 12),   -- Charcoal Dark
+        Sidebar = Color3.fromRGB(18, 18, 18),      -- Dark Gray Sidebar
+        Groupbox = Color3.fromRGB(20, 20, 20),     -- Groupbox Card
+        Accent = Color3.fromRGB(220, 45, 45),      -- Aimware Red
+        Text = Color3.fromRGB(255, 255, 255),
+        TextMuted = Color3.fromRGB(150, 150, 150),
+        Border = Color3.fromRGB(45, 45, 45),       -- Outline Border
         Font = Enum.Font.SourceSans,
         FontBold = Enum.Font.SourceSansBold
     }
 }
 
--- Unicode Icon mapping for Midnight style sidebar
+-- Unicode Icon mapping for Aimware style sidebar
 local IconMap = {
     home = "🎯",
     aimbot = "🎯",
@@ -215,7 +215,7 @@ function Library:Notify(text, duration)
     card.Parent = NotificationContainer
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 3)
+    corner.CornerRadius = UDim.new(0, 0)
     corner.Parent = card
     
     local stroke = Instance.new("UIStroke")
@@ -298,7 +298,7 @@ WatermarkFrame.Visible = false
 WatermarkFrame.Parent = ScreenGui
 
 local wmCorner = Instance.new("UICorner")
-wmCorner.CornerRadius = UDim.new(0, 3)
+wmCorner.CornerRadius = UDim.new(0, 0)
 wmCorner.Parent = WatermarkFrame
 
 local wmStroke = Instance.new("UIStroke")
@@ -339,7 +339,7 @@ RunService.RenderStepped:Connect(function()
             ping = math.round(Players.LocalPlayer:GetNetworkPing() * 1000)
         end)
         local timeStr = os.date("%H:%M:%S")
-        wmLabel.Text = string.format("midnight.im | %s | FPS: %d | Ping: %dms", timeStr, fpsCount, ping)
+        wmLabel.Text = string.format("aimware.net | %s | FPS: %d | Ping: %dms", timeStr, fpsCount, ping)
     end
 end)
 
@@ -347,32 +347,33 @@ function Library:SetWatermarkVisibility(visible)
     WatermarkFrame.Visible = visible
 end
 
--- MainWindow construction (Midnight style glassmorphic layout)
+-- MainWindow construction (Aimware style retro layout)
 function Library:CreateWindow(config)
     config = config or {}
-    local titleText = config.Title or "midnight"
+    local titleText = config.Title or "aimware"
     
     local WindowFrame = Instance.new("Frame")
-    WindowFrame.Size = UDim2.new(0, 680, 0, 480)
-    WindowFrame.Position = UDim2.new(0.5, -340, 0.5, -240)
+    WindowFrame.Size = UDim2.new(0, 720, 0, 500)
+    WindowFrame.Position = UDim2.new(0.5, -360, 0.5, -250)
     WindowFrame.BackgroundColor3 = Library.Theme.Background
     WindowFrame.BorderSizePixel = 0
     WindowFrame.ClipsDescendants = true
     WindowFrame.Parent = TrackInstance(ScreenGui)
     
     local wCorner = Instance.new("UICorner")
-    wCorner.CornerRadius = UDim.new(0, 3) -- Sharp 3px corners
+    wCorner.CornerRadius = UDim.new(0, 0) -- STRICTLY SQUARE CORNERS FOR AIMWARE
     wCorner.Parent = WindowFrame
     
+    -- Aimware style double border layout: a clean outline
     local wStroke = Instance.new("UIStroke")
     wStroke.Color = Library.Theme.Border
-    wStroke.Thickness = 1
+    wStroke.Thickness = 1.5
     wStroke.Parent = WindowFrame
     
-    -- Narrow, clean icons-only sidebar on the left (55px wide, full height)
+    -- Narrow, clean icons-only sidebar on the left (120px wide, full height)
     local Sidebar = Instance.new("Frame")
     Sidebar.Position = UDim2.new(0, 0, 0, 0)
-    Sidebar.Size = UDim2.new(0, 55, 1, 0)
+    Sidebar.Size = UDim2.new(0, 120, 1, 0)
     Sidebar.BackgroundColor3 = Library.Theme.Sidebar
     Sidebar.BorderSizePixel = 0
     Sidebar.Parent = WindowFrame
@@ -389,9 +390,9 @@ function Library:CreateWindow(config)
     LogoLabel.Size = UDim2.new(1, 0, 0, 50)
     LogoLabel.Position = UDim2.new(0, 0, 0, 0)
     LogoLabel.BackgroundTransparency = 1
-    LogoLabel.Text = "🌙"
+    LogoLabel.Text = "AIMWARE.net"
     LogoLabel.TextColor3 = Library.Theme.Accent
-    LogoLabel.TextSize = 20
+    LogoLabel.TextSize = 14
     LogoLabel.Font = Library.Theme.FontBold
     LogoLabel.Parent = Sidebar
     RegisterAccent(LogoLabel, "TextColor3")
@@ -404,15 +405,15 @@ function Library:CreateWindow(config)
     ButtonHolder.Parent = Sidebar
     
     local SideLayout = Instance.new("UIListLayout")
-    SideLayout.Padding = UDim.new(0, 10)
+    SideLayout.Padding = UDim.new(0, 4)
     SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     SideLayout.VerticalAlignment = Enum.VerticalAlignment.Top
     SideLayout.Parent = ButtonHolder
     
     -- Main container on the right
     local Container = Instance.new("Frame")
-    Container.Position = UDim2.new(0, 55, 0, 0)
-    Container.Size = UDim2.new(1, -55, 1, 0)
+    Container.Position = UDim2.new(0, 120, 0, 0)
+    Container.Size = UDim2.new(1, -120, 1, 0)
     Container.BackgroundTransparency = 1
     Container.Parent = WindowFrame
     
@@ -427,7 +428,7 @@ function Library:CreateWindow(config)
     TitleLabel.Position = UDim2.new(0, 16, 0, 0)
     TitleLabel.Size = UDim2.new(0.6, 0, 1, 0)
     TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Text = titleText:lower()
+    TitleLabel.Text = titleText:upper()
     TitleLabel.TextColor3 = Library.Theme.Text
     TitleLabel.Font = Library.Theme.FontBold
     TitleLabel.TextSize = 13
@@ -436,8 +437,8 @@ function Library:CreateWindow(config)
     
     -- macOS style close/min buttons
     local ControlFrame = Instance.new("Frame")
-    ControlFrame.Position = UDim2.new(1, -55, 0, 0)
-    ControlFrame.Size = UDim2.new(0, 45, 1, 0)
+    ControlFrame.Position = UDim2.new(1, -65, 0, 0)
+    ControlFrame.Size = UDim2.new(0, 55, 1, 0)
     ControlFrame.BackgroundTransparency = 1
     ControlFrame.Parent = TopBar
     
@@ -449,23 +450,29 @@ function Library:CreateWindow(config)
     ControlLayout.Parent = ControlFrame
     
     local MinButton = Instance.new("TextButton")
-    MinButton.Size = UDim2.new(0, 10, 0, 10)
-    MinButton.BackgroundColor3 = Color3.fromRGB(250, 180, 50)
-    MinButton.Text = ""
+    MinButton.Size = UDim2.new(0, 18, 0, 18)
+    MinButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    MinButton.Text = "_"
+    MinButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+    MinButton.Font = Library.Theme.FontBold
+    MinButton.TextSize = 12
     MinButton.Parent = ControlFrame
     
     local minCorner = Instance.new("UICorner")
-    minCorner.CornerRadius = UDim.new(1, 0)
+    minCorner.CornerRadius = UDim.new(0, 0)
     minCorner.Parent = MinButton
     
     local CloseButton = Instance.new("TextButton")
-    CloseButton.Size = UDim2.new(0, 10, 0, 10)
-    CloseButton.BackgroundColor3 = Color3.fromRGB(250, 80, 80)
-    CloseButton.Text = ""
+    CloseButton.Size = UDim2.new(0, 18, 0, 18)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    CloseButton.Text = "X"
+    CloseButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+    CloseButton.Font = Library.Theme.FontBold
+    CloseButton.TextSize = 11
     CloseButton.Parent = ControlFrame
     
     local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(1, 0)
+    closeCorner.CornerRadius = UDim.new(0, 0)
     closeCorner.Parent = CloseButton
     
     local Minimized = false
@@ -473,9 +480,9 @@ function Library:CreateWindow(config)
         Minimized = not Minimized
         CloseAllPopups()
         if Minimized then
-            Tween(WindowFrame, 0.2, {Size = UDim2.new(0, 680, 0, 40)})
+            Tween(WindowFrame, 0.2, {Size = UDim2.new(0, 720, 0, 40)})
         else
-            Tween(WindowFrame, 0.2, {Size = UDim2.new(0, 680, 0, 480)})
+            Tween(WindowFrame, 0.2, {Size = UDim2.new(0, 720, 0, 500)})
         end
     end)
     
@@ -507,27 +514,28 @@ function Library:CreateWindow(config)
     function Window:AddTab(tabName, icon)
         local tabIndex = #Window.Tabs + 1
         
-        -- Icons-only tab button
+        -- Icons + Text tab button for Aimware
         local TabButton = Instance.new("TextButton")
-        TabButton.Size = UDim2.new(0, 36, 0, 36)
+        TabButton.Size = UDim2.new(1, -12, 0, 32)
         TabButton.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
         TabButton.BackgroundTransparency = 1
         TabButton.BorderSizePixel = 0
-        TabButton.Text = IconMap[icon:lower()] or IconMap[tabName:lower()] or "🎯"
+        TabButton.Text = "  " .. (IconMap[icon:lower()] or IconMap[tabName:lower()] or "🎯") .. "  " .. tabName
         TabButton.TextColor3 = Library.Theme.TextMuted
         TabButton.Font = Library.Theme.FontBold
-        TabButton.TextSize = 16
+        TabButton.TextSize = 11
+        TabButton.TextXAlignment = Enum.TextXAlignment.Left
         TabButton.Parent = ButtonHolder
         
         local tbCorner = Instance.new("UICorner")
-        tbCorner.CornerRadius = UDim.new(0, 3)
+        tbCorner.CornerRadius = UDim.new(0, 0) -- SQUARE CORNERS FOR AIMWARE
         tbCorner.Parent = TabButton
         
         -- Active Left Border Indicator
         local ActiveIndicator = Instance.new("Frame")
         ActiveIndicator.Name = "ActiveIndicator"
-        ActiveIndicator.Size = UDim2.new(0, 2, 0.6, 0)
-        ActiveIndicator.Position = UDim2.new(0, 0, 0.2, 0)
+        ActiveIndicator.Size = UDim2.new(0, 3, 1, 0)
+        ActiveIndicator.Position = UDim2.new(0, 0, 0, 0)
         ActiveIndicator.BackgroundColor3 = Library.Theme.Accent
         ActiveIndicator.BorderSizePixel = 0
         ActiveIndicator.Visible = false
@@ -625,7 +633,7 @@ function Library:CreateWindow(config)
             gb.Parent = parentScroll
             
             local gbCorner = Instance.new("UICorner")
-            gbCorner.CornerRadius = UDim.new(0, 3)
+            gbCorner.CornerRadius = UDim.new(0, 0)
             gbCorner.Parent = gb
             
             local gbStroke = Instance.new("UIStroke")
@@ -685,7 +693,7 @@ function Library:CreateWindow(config)
                 RegisterAccent(CheckboxFrame, "BackgroundColor3")
                 
                 local cbCorner = Instance.new("UICorner")
-                cbCorner.CornerRadius = UDim.new(0, 2) -- sharp 2px checkbox corners
+                cbCorner.CornerRadius = UDim.new(0, 0) -- sharp 2px checkbox corners
                 cbCorner.Parent = CheckboxFrame
                 
                 local cbStroke = Instance.new("UIStroke")
@@ -704,7 +712,7 @@ function Library:CreateWindow(config)
                 CheckIndicator.Parent = CheckboxFrame
                 
                 local ciCorner = Instance.new("UICorner")
-                ciCorner.CornerRadius = UDim.new(0, 1)
+                ciCorner.CornerRadius = UDim.new(0, 0)
                 ciCorner.Parent = CheckIndicator
                 
                 local label = Instance.new("TextLabel")
@@ -781,7 +789,7 @@ function Library:CreateWindow(config)
                     KeybindButton.Parent = RightControls
                     
                     local kbCorner = Instance.new("UICorner")
-                    kbCorner.CornerRadius = UDim.new(0, 2)
+                    kbCorner.CornerRadius = UDim.new(0, 0)
                     kbCorner.Parent = KeybindButton
                     
                     local kbStroke = Instance.new("UIStroke")
@@ -848,7 +856,7 @@ function Library:CreateWindow(config)
                     ColorBox.Parent = RightControls
                     
                     local cpCorner = Instance.new("UICorner")
-                    cpCorner.CornerRadius = UDim.new(0, 2)
+                    cpCorner.CornerRadius = UDim.new(0, 0)
                     cpCorner.Parent = ColorBox
                     
                     local cpStroke = Instance.new("UIStroke")
@@ -869,7 +877,7 @@ function Library:CreateWindow(config)
                         PickerPopup.Parent = Overlay
                         
                         local popupCorner = Instance.new("UICorner")
-                        popupCorner.CornerRadius = UDim.new(0, 3)
+                        popupCorner.CornerRadius = UDim.new(0, 0)
                         popupCorner.Parent = PickerPopup
                         
                         local popupStroke = Instance.new("UIStroke")
@@ -945,11 +953,11 @@ function Library:CreateWindow(config)
                             fill.Parent = track
                             
                             local fCorner = Instance.new("UICorner")
-                            fCorner.CornerRadius = UDim.new(1, 0)
+                            fCorner.CornerRadius = UDim.new(0, 0)
                             fCorner.Parent = fill
                             
                             local trCorner = Instance.new("UICorner")
-                            trCorner.CornerRadius = UDim.new(1, 0)
+                            trCorner.CornerRadius = UDim.new(0, 0)
                             trCorner.Parent = track
                             
                             local function Update(input)
@@ -1003,7 +1011,7 @@ function Library:CreateWindow(config)
                             pBtn.Parent = PresetsFrame
                             
                             local pCorner = Instance.new("UICorner")
-                            pCorner.CornerRadius = UDim.new(1, 0)
+                            pCorner.CornerRadius = UDim.new(0, 0)
                             pCorner.Parent = pBtn
                             
                             local pStr = Instance.new("UIStroke")
@@ -1075,7 +1083,7 @@ function Library:CreateWindow(config)
                 Track.Parent = sliderFrame
                 
                 local trCorner = Instance.new("UICorner")
-                trCorner.CornerRadius = UDim.new(1, 0)
+                trCorner.CornerRadius = UDim.new(0, 0)
                 trCorner.Parent = Track
                 
                 local trStroke = Instance.new("UIStroke")
@@ -1091,7 +1099,7 @@ function Library:CreateWindow(config)
                 RegisterAccent(Fill, "BackgroundColor3")
                 
                 local fCorner = Instance.new("UICorner")
-                fCorner.CornerRadius = UDim.new(1, 0)
+                fCorner.CornerRadius = UDim.new(0, 0)
                 fCorner.Parent = Fill
                 
                 -- Small circular thumb handle
@@ -1103,7 +1111,7 @@ function Library:CreateWindow(config)
                 Thumb.Parent = Fill
                 
                 local thumbCorner = Instance.new("UICorner")
-                thumbCorner.CornerRadius = UDim.new(1, 0)
+                thumbCorner.CornerRadius = UDim.new(0, 0)
                 thumbCorner.Parent = Thumb
                 
                 local thumbStroke = Instance.new("UIStroke")
@@ -1208,7 +1216,7 @@ function Library:CreateWindow(config)
                 TriggerButton.Parent = dropFrame
                 
                 local tbCorner = Instance.new("UICorner")
-                tbCorner.CornerRadius = UDim.new(0, 2)
+                tbCorner.CornerRadius = UDim.new(0, 0)
                 tbCorner.Parent = TriggerButton
                 
                 local tbStroke = Instance.new("UIStroke")
@@ -1297,7 +1305,7 @@ function Library:CreateWindow(config)
                     end)
                     
                     local dpCorner = Instance.new("UICorner")
-                    dpCorner.CornerRadius = UDim.new(0, 2)
+                    dpCorner.CornerRadius = UDim.new(0, 0)
                     dpCorner.Parent = DropdownPopup
                     
                     local dpStroke = Instance.new("UIStroke")
@@ -1317,7 +1325,7 @@ function Library:CreateWindow(config)
                     SearchBox.Parent = DropdownPopup
                     
                     local sCorner = Instance.new("UICorner")
-                    sCorner.CornerRadius = UDim.new(0, 2)
+                    sCorner.CornerRadius = UDim.new(0, 0)
                     sCorner.Parent = SearchBox
                     
                     local sStroke = Instance.new("UIStroke")
@@ -1356,7 +1364,7 @@ function Library:CreateWindow(config)
                         btn.Parent = ListFrame
                         
                         local bCorner = Instance.new("UICorner")
-                        bCorner.CornerRadius = UDim.new(0, 2)
+                        bCorner.CornerRadius = UDim.new(0, 0)
                         bCorner.Parent = btn
                         
                         local bStr = Instance.new("UIStroke")
@@ -1475,7 +1483,7 @@ function Library:CreateWindow(config)
                 box.Parent = inputFrame
                 
                 local bCorner = Instance.new("UICorner")
-                bCorner.CornerRadius = UDim.new(0, 2)
+                bCorner.CornerRadius = UDim.new(0, 0)
                 bCorner.Parent = box
                 
                 local bStroke = Instance.new("UIStroke")
@@ -1524,7 +1532,7 @@ function Library:CreateWindow(config)
                 btn.Parent = ContentArea
                 
                 local bCorner = Instance.new("UICorner")
-                bCorner.CornerRadius = UDim.new(0, 2)
+                bCorner.CornerRadius = UDim.new(0, 0)
                 bCorner.Parent = btn
                 
                 local bStroke = Instance.new("UIStroke")
@@ -1586,7 +1594,7 @@ function Library:CreateWindow(config)
                     KeybindButton.Parent = labelFrame
                     
                     local kbCorner = Instance.new("UICorner")
-                    kbCorner.CornerRadius = UDim.new(0, 2)
+                    kbCorner.CornerRadius = UDim.new(0, 0)
                     kbCorner.Parent = KeybindButton
                     
                     local kbStroke = Instance.new("UIStroke")
@@ -1665,7 +1673,7 @@ function Library:CreateWindow(config)
                     ColorBox.Parent = RightControls
                     
                     local cpCorner = Instance.new("UICorner")
-                    cpCorner.CornerRadius = UDim.new(0, 2)
+                    cpCorner.CornerRadius = UDim.new(0, 0)
                     cpCorner.Parent = ColorBox
                     
                     local cpStroke = Instance.new("UIStroke")
@@ -1686,7 +1694,7 @@ function Library:CreateWindow(config)
                         PickerPopup.Parent = Overlay
                         
                         local popupCorner = Instance.new("UICorner")
-                        popupCorner.CornerRadius = UDim.new(0, 3)
+                        popupCorner.CornerRadius = UDim.new(0, 0)
                         popupCorner.Parent = PickerPopup
                         
                         local popupStroke = Instance.new("UIStroke")
@@ -1762,11 +1770,11 @@ function Library:CreateWindow(config)
                             fill.Parent = track
                             
                             local fCorner = Instance.new("UICorner")
-                            fCorner.CornerRadius = UDim.new(1, 0)
+                            fCorner.CornerRadius = UDim.new(0, 0)
                             fCorner.Parent = fill
                             
                             local trCorner = Instance.new("UICorner")
-                            trCorner.CornerRadius = UDim.new(1, 0)
+                            trCorner.CornerRadius = UDim.new(0, 0)
                             trCorner.Parent = track
                             
                             local function Update(input)
@@ -1820,7 +1828,7 @@ function Library:CreateWindow(config)
                             pBtn.Parent = PresetsFrame
                             
                             local pCorner = Instance.new("UICorner")
-                            pCorner.CornerRadius = UDim.new(1, 0)
+                            pCorner.CornerRadius = UDim.new(0, 0)
                             pCorner.Parent = pBtn
                             
                             local pStr = Instance.new("UIStroke")
@@ -1919,7 +1927,7 @@ Library.ThemeManager = {
         group:AddDropdown("ThemePreset", {
             Text = "Quick Theme Presets",
             Values = {"Midnight Cyan", "Electric Mint", "Royal Blue", "Crimson Red", "Vibrant Orange", "Orchid Purple"},
-            Default = "Midnight Cyan",
+            Default = "Crimson Red",
             Callback = function(val)
                 local color = presets[val]
                 if color then
@@ -1929,8 +1937,8 @@ Library.ThemeManager = {
         })
         
         group:AddButton("Reset Theme", function()
-            Library:UpdateTheme(Color3.fromRGB(0, 180, 255))
-            Library:Notify("Theme reset to Midnight Cyan!")
+            Library:UpdateTheme(Color3.fromRGB(220, 45, 45))
+            Library:Notify("Theme reset to Crimson Red!")
         end)
     end
 }
