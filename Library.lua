@@ -825,7 +825,7 @@ function Library:CreateWindow(config)
         return Tab
     end
         
-        local function CreateGroupbox(title, parentScroll)
+        function CreateGroupbox(title, parentScroll)
             local gb = Instance.new("Frame")
             gb.Size = UDim2.new(1, -6, 0, 40)
             gb.BackgroundColor3 = Library.Theme.Groupbox
@@ -2060,20 +2060,8 @@ function Library:CreateWindow(config)
             return Groupbox
         end
         
-        function Tab:AddLeftGroupbox(title)
-            return CreateGroupbox(title, LeftScroll)
-        end
-        
-        function Tab:AddRightGroupbox(title)
-            return CreateGroupbox(title, RightScroll)
-        end
-        
-        table.insert(Window.Tabs, Tab)
-        return Tab
+        return Window
     end
-    
-    return Window
-end
 
 -- Unload handler
 function Library:OnUnload(callback)
