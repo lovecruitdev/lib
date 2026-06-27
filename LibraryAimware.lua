@@ -942,28 +942,7 @@ function Library:CreateWindow(config)
                 RightLayout.SortOrder = Enum.SortOrder.LayoutOrder
                 RightLayout.Parent = RightControls
                 
-                local ToggleState = default
-                
-                local function SetState(val, skipCallback)
-                    ToggleState = val
-                    Library.Toggles[id] = { Value = val }
-                    CheckboxFrame:SetAttribute("Active", val)
-                    cbStroke:SetAttribute("Active", val)
-                    
-                    if not skipCallback then
-                        pcall(callback, val)
-                    end
-                    
-                    if ToggleState then
-                        Tween(CheckboxFrame, 0.1, {BackgroundColor3 = Library.Theme.Accent})
-                        Tween(cbStroke, 0.1, {Color = Library.Theme.Accent})
-                        Tween(CheckIndicator, 0.1, {Size = UDim2.new(0, 8, 0, 8)})
-                    else
-                        Tween(CheckboxFrame, 0.1, {BackgroundColor3 = Color3.fromRGB(16, 16, 20)})
-                        Tween(cbStroke, 0.1, {Color = Color3.fromRGB(35, 35, 45)})
-                        Tween(CheckIndicator, 0.1, {Size = UDim2.new(0, 0, 0, 0)})
-                    end
-                end
+
                 
                 toggleFrame.MouseButton1Click:Connect(function()
                     SetState(not ToggleState)
