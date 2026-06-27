@@ -2089,20 +2089,8 @@ function Library:CreateWindow(config)
             return Groupbox
         end
         
-        function Tab:AddLeftGroupbox(title)
-            return CreateGroupbox(title, LeftScroll)
-        end
-        
-        function Tab:AddRightGroupbox(title)
-            return CreateGroupbox(title, RightScroll)
-        end
-        
-        table.insert(Window.Tabs, Tab)
-        return Tab
+        return Window
     end
-    
-    return Window
-end
 
 -- Unload handler
 function Library:OnUnload(callback)
