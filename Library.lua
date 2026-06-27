@@ -23,17 +23,22 @@ local Library = {
     }
 }
 
--- Unicode Icon mapping for Midnight style sidebar
+-- Roblox Asset ID Icon mapping for Midnight style sidebar
 local IconMap = {
-    home = "🎯",
-    aimbot = "🎯",
-    legit = "🎯",
-    eye = "👁️",
-    visuals = "👁️",
-    settings = "⚙️",
-    gear = "⚙️",
-    misc = "🔧",
-    cloud = "📁"
+    home = "rbxassetid://6015206346",
+    aimbot = "rbxassetid://6031225818",
+    combat = "rbxassetid://6031225818",
+    eye = "rbxassetid://6031154749",
+    visuals = "rbxassetid://6031154749",
+    players = "rbxassetid://6023426915",
+    items = "rbxassetid://6034853871",
+    view = "rbxassetid://6031154749",
+    hud = "rbxassetid://6034853721",
+    settings = "rbxassetid://6031280224",
+    gear = "rbxassetid://6031280224",
+    misc = "rbxassetid://6022668955",
+    cloud = "rbxassetid://6034853641",
+    folder = "rbxassetid://6034853641"
 }
 
 -- Safe Font Resolver prioritizing Gotham
@@ -439,10 +444,14 @@ function Library:CreateWindow(config)
         secFrame.Visible = false
         secFrame.Parent = ButtonHolder
         
+        local OrderMap = { ["Combat"] = 1, ["Visuals"] = 2, ["Misc"] = 3 }
+        secFrame.LayoutOrder = OrderMap[name] or 4
+        
         local secLayout = Instance.new("UIListLayout")
         secLayout.Padding = UDim.new(0, 4)
         secLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
         secLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+        secLayout.SortOrder = Enum.SortOrder.LayoutOrder
         secLayout.Parent = secFrame
         
         secLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -457,17 +466,20 @@ function Library:CreateWindow(config)
         secLabel.Font = Library.Theme.FontBold
         secLabel.TextSize = 10
         secLabel.TextXAlignment = Enum.TextXAlignment.Left
+        secLabel.LayoutOrder = 1
         secLabel.Parent = secFrame
         
         local buttonList = Instance.new("Frame")
         buttonList.Size = UDim2.new(1, 0, 0, 0)
         buttonList.BackgroundTransparency = 1
+        buttonList.LayoutOrder = 2
         buttonList.Parent = secFrame
         
         local listLayout = Instance.new("UIListLayout")
         listLayout.Padding = UDim.new(0, 4)
         listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
         listLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+        listLayout.SortOrder = Enum.SortOrder.LayoutOrder
         listLayout.Parent = buttonList
         
         listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -518,20 +530,18 @@ function Library:CreateWindow(config)
     DecoLayout.Padding = UDim.new(0, 12)
     DecoLayout.Parent = DecoHolder
     
-    local SearchIcon = Instance.new("TextLabel")
-    SearchIcon.Size = UDim2.new(0, 16, 0, 16)
+    local SearchIcon = Instance.new("ImageLabel")
+    SearchIcon.Size = UDim2.new(0, 14, 0, 14)
     SearchIcon.BackgroundTransparency = 1
-    SearchIcon.Text = "🔍"
-    SearchIcon.TextColor3 = Color3.fromRGB(150, 155, 165)
-    SearchIcon.TextSize = 12
+    SearchIcon.Image = "rbxassetid://6031154784"
+    SearchIcon.ImageColor3 = Color3.fromRGB(150, 155, 165)
     SearchIcon.Parent = DecoHolder
     
-    local SettingsIcon = Instance.new("TextLabel")
-    SettingsIcon.Size = UDim2.new(0, 16, 0, 16)
+    local SettingsIcon = Instance.new("ImageLabel")
+    SettingsIcon.Size = UDim2.new(0, 14, 0, 14)
     SettingsIcon.BackgroundTransparency = 1
-    SettingsIcon.Text = "⚙️"
-    SettingsIcon.TextColor3 = Color3.fromRGB(150, 155, 165)
-    SettingsIcon.TextSize = 12
+    SettingsIcon.Image = "rbxassetid://6031280224"
+    SettingsIcon.ImageColor3 = Color3.fromRGB(150, 155, 165)
     SettingsIcon.Parent = DecoHolder
     
     -- top-right close/minimize buttons (macOS style circle style for Midnight)
@@ -622,18 +632,33 @@ function Library:CreateWindow(config)
         TabButton.BackgroundColor3 = Color3.fromRGB(19, 21, 28)
         TabButton.BackgroundTransparency = 1
         TabButton.BorderSizePixel = 0
-        
-        local cleanIcon = IconMap[icon:lower()] or IconMap[tabName:lower()] or "🎯"
-        TabButton.Text = "     " .. cleanIcon .. "   " .. tabName
-        TabButton.TextColor3 = Color3.fromRGB(120, 125, 135) -- `#787d87`
-        TabButton.Font = Library.Theme.FontBold
-        TabButton.TextSize = 11
-        TabButton.TextXAlignment = Enum.TextXAlignment.Left
+        TabButton.Text = ""
         TabButton.Parent = parentSection
         
         local tbCorner = Instance.new("UICorner")
         tbCorner.CornerRadius = UDim.new(0, 4)
         tbCorner.Parent = TabButton
+        
+        -- High quality monochrome ImageLabel for the icon
+        local TabIcon = Instance.new("ImageLabel")
+        TabIcon.Size = UDim2.new(0, 14, 0, 14)
+        TabIcon.Position = UDim2.new(0, 12, 0.5, -7)
+        TabIcon.BackgroundTransparency = 1
+        TabIcon.Image = IconMap[icon:lower()] or IconMap[tabName:lower()] or "rbxassetid://6015206346"
+        TabIcon.ImageColor3 = Color3.fromRGB(120, 125, 135) -- `#787d87`
+        TabIcon.Parent = TabButton
+        
+        -- TextLabel for the tab name
+        local TabText = Instance.new("TextLabel")
+        TabText.Size = UDim2.new(1, -40, 1, 0)
+        TabText.Position = UDim2.new(0, 36, 0, 0)
+        TabText.BackgroundTransparency = 1
+        TabText.Text = tabName
+        TabText.TextColor3 = Color3.fromRGB(120, 125, 135) -- `#787d87`
+        TabText.Font = Library.Theme.FontBold
+        TabText.TextSize = 11
+        TabText.TextXAlignment = Enum.TextXAlignment.Left
+        TabText.Parent = TabButton
         
         -- Frame to hold horizontal sub-tab buttons in the TopBar
         local SubTabButtonsHolder = Instance.new("Frame")
@@ -661,6 +686,8 @@ function Library:CreateWindow(config)
             SubTabs = {},
             ActiveSubTab = nil,
             TabButton = TabButton,
+            TabText = TabText,
+            TabIcon = TabIcon,
             SubTabButtonsHolder = SubTabButtonsHolder,
             Panel = TabPanel
         }
@@ -668,12 +695,14 @@ function Library:CreateWindow(config)
         -- Hover styling
         TabButton.MouseEnter:Connect(function()
             if Window.ActiveTab ~= Tab then
-                Tween(TabButton, 0.1, {TextColor3 = Color3.fromRGB(240, 240, 240)})
+                Tween(TabText, 0.1, {TextColor3 = Color3.fromRGB(240, 240, 240)})
+                Tween(TabIcon, 0.1, {ImageColor3 = Color3.fromRGB(240, 240, 240)})
             end
         end)
         TabButton.MouseLeave:Connect(function()
             if Window.ActiveTab ~= Tab then
-                Tween(TabButton, 0.1, {TextColor3 = Color3.fromRGB(120, 125, 135)})
+                Tween(TabText, 0.1, {TextColor3 = Color3.fromRGB(120, 125, 135)})
+                Tween(TabIcon, 0.1, {ImageColor3 = Color3.fromRGB(120, 125, 135)})
             end
         end)
         
@@ -800,14 +829,16 @@ function Library:CreateWindow(config)
         
         local function Activate()
             if Window.ActiveTab then
-                Window.ActiveTab.TabButton.TextColor3 = Color3.fromRGB(120, 125, 135)
+                Tween(Window.ActiveTab.TabText, 0.1, {TextColor3 = Color3.fromRGB(120, 125, 135)})
+                Tween(Window.ActiveTab.TabIcon, 0.1, {ImageColor3 = Color3.fromRGB(120, 125, 135)})
                 Window.ActiveTab.TabButton.BackgroundColor3 = Color3.fromRGB(19, 21, 28)
                 Window.ActiveTab.TabButton.BackgroundTransparency = 1
                 Window.ActiveTab.SubTabButtonsHolder.Visible = false
                 Window.ActiveTab.Panel.Visible = false -- Hide old main TabPanel!
             end
             Window.ActiveTab = Tab
-            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Tween(TabText, 0.1, {TextColor3 = Color3.fromRGB(255, 255, 255)})
+            Tween(TabIcon, 0.1, {ImageColor3 = Color3.fromRGB(255, 255, 255)})
             TabButton.BackgroundColor3 = Color3.fromRGB(19, 21, 28) -- Active dark block
             TabButton.BackgroundTransparency = 0.5
             SubTabButtonsHolder.Visible = true
