@@ -1,9 +1,9 @@
--- [[ TEST SCRIPT FOR AIMWARE RETRO PREMIUM GUI ]] --
--- Run this inside your Roblox Executor to preview the retro Aimware UI.
+-- [[ TEST SCRIPT FOR AIMWARE V5 1:1 UI REPLICA ]] --
+-- Run this inside your Roblox Executor to preview the 1:1 replica of the Aimware v5 UI.
 
 local Library
 local success, err = pcall(function()
-    -- Force load online from GitHub with cache bypass to prevent executor caching issues
+    -- Force load online from GitHub with cache bypass
     Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/lovecruitdev/lib/main/LibraryAimware.lua?t=" .. os.time()))()
 end)
 
@@ -25,119 +25,121 @@ end
 
 -- Create the main window
 local Window = Library:CreateWindow({
-    Title = "AIMWARE.net | Roblox Edition",
+    Title = "V5 DEV for Counter-Strike: Global Offensive",
     Center = true
 })
 
 -- Enable the performance stats watermark
 Library:SetWatermarkVisibility(true)
 
--- Create tabs
+-- Create top tabs (with authentic icons from screenshots)
 local Tabs = {
-    Main = Window:AddTab("Main Controls", "home"),
-    Visuals = Window:AddTab("Visuals", "eye"),
-    Settings = Window:AddTab("Settings", "settings")
+    Legitbot = Window:AddTab("Legitbot", "🔫"),
+    Ragebot = Window:AddTab("Ragebot", "💀"),
+    Visuals = Window:AddTab("Visuals", "👁️"),
+    Misc = Window:AddTab("Misc", "🔧"),
+    Settings = Window:AddTab("Settings", "⚙️")
 }
 
--- 1. Main Tab Controls
-local MainBox = Tabs.Main:AddLeftGroupbox("Feature Toggles")
+-- 1. Legitbot Sub-Tabs
+local LegitAimbot = Tabs.Legitbot:AddSubTab("Aimbot")
+local LegitTrigger = Tabs.Legitbot:AddSubTab("Triggerbot")
+local LegitWeapon = Tabs.Legitbot:AddSubTab("Weapon")
+local LegitAdvanced = Tabs.Legitbot:AddSubTab("Advanced")
 
-MainBox:AddToggle("GodMode", {
-    Text = "Enable Godmode",
-    Default = false,
-    Callback = function(val)
-        Library:Notify("Godmode state: " .. tostring(val))
-    end
+-- Populate Legitbot > Aimbot
+local ToggleBox = LegitAimbot:AddLeftGroupbox("Toggle")
+ToggleBox:AddToggle("LegitEnable", {
+    Text = "Enable Aimbot",
+    Default = true
 })
 
-MainBox:AddToggle("DesyncToggle", {
-    Text = "Enable Desync",
-    Default = true,
-    Callback = function(val)
-        Library:Notify("Desync state: " .. tostring(val))
-    end
-}):AddKeyPicker("DesyncBind", {
-    Default = "V",
-    SyncToggleState = true
-}):AddColorPicker("DesyncColor", {
-    Default = Color3.fromRGB(220, 45, 45),
-    Callback = function(color)
-        Library:Notify("Desync color updated!")
-    end
+local AimKeyButton = ToggleBox:AddLabel("Aim Key"):AddKeyPicker("AimKeyBind", {
+    Default = "Mouse1",
+    NoUI = false
 })
 
-local MainRight = Tabs.Main:AddRightGroupbox("Adjustments")
-
-MainRight:AddSlider("WalkSpeed", {
-    Text = "Walkspeed Adjust",
-    Min = 16,
-    Max = 150,
-    Default = 16,
-    Rounding = 0,
-    Callback = function(val)
-        print("WalkSpeed adjusted: " .. val)
-    end
+local ToggleKeyButton = ToggleBox:AddLabel("Toggle Key"):AddKeyPicker("ToggleKeyBind", {
+    Default = "None",
+    NoUI = false
 })
 
--- Searchable Dropdown
-MainRight:AddDropdown("AimPart", {
-    Text = "Aim target part (Searchable)",
-    Values = {"Head", "Torso", "HumanoidRootPart", "Left Arm", "Right Arm"},
-    Default = 1,
-    Multi = false,
-    Callback = function(val)
-        Library:Notify("Aim target set to: " .. val)
-    end
+-- Populate Legitbot > Weapon
+local WeaponBox = LegitWeapon:AddLeftGroupbox("Weapon")
+WeaponBox:AddToggle("AutoFire", {
+    Text = "Auto Fire",
+    Default = false
+})
+WeaponBox:AddToggle("FireOnPress", {
+    Text = "Fire On Press",
+    Default = true
+})
+WeaponBox:AddSlider("AutoPistolInterval", {
+    Text = "Auto Pistol Interval",
+    Min = 50,
+    Max = 500,
+    Default = 150,
+    Rounding = 0
 })
 
-MainRight:AddDropdown("TargetPlayers", {
-    Text = "Target Player Teams (Multi)",
-    Values = {"Enemies", "Friends", "Neutral", "Admins"},
-    Default = {"Enemies"},
-    Multi = true,
-    Callback = function(tbl)
-        local selected = {}
-        for k, v in pairs(tbl) do
-            if v then table.insert(selected, k) end
-        end
-        Library:Notify("Target teams: " .. table.concat(selected, ", "))
-    end
+-- 2. Ragebot Sub-Tabs
+local RageAimbot = Tabs.Ragebot:AddSubTab("Aimbot")
+local RageAccuracy = Tabs.Ragebot:AddSubTab("Accuracy")
+local RageAntiAim = Tabs.Ragebot:AddSubTab("Anti-Aim")
+
+-- Populate Ragebot > Aimbot
+local RageAimbotBox = RageAimbot:AddLeftGroupbox("Aimbot")
+RageAimbotBox:AddToggle("RageEnable", {
+    Text = "Enable Ragebot",
+    Default = false
 })
 
--- 2. Visuals Tab Controls
-local VisualsLeft = Tabs.Visuals:AddLeftGroupbox("ESP Config")
+-- 3. Visuals Sub-Tabs
+local VisualsOverlay = Tabs.Visuals:AddSubTab("Overlay")
+local VisualsLocal = Tabs.Visuals:AddSubTab("Local")
+local VisualsWorld = Tabs.Visuals:AddSubTab("World")
+local VisualsChams = Tabs.Visuals:AddSubTab("Chams")
+local VisualsSkins = Tabs.Visuals:AddSubTab("Skins")
+local VisualsOther = Tabs.Visuals:AddSubTab("Other")
 
-VisualsLeft:AddToggle("PlayerESP", {
-    Text = "Show Players",
-    Default = false,
-    Callback = function(val)
-        Library:Notify("Player ESP: " .. tostring(val))
-    end
+-- Populate Visuals > Overlay
+local EnemyBox = VisualsOverlay:AddLeftGroupbox("Enemy")
+EnemyBox:AddToggle("EnemyBoxEsp", {
+    Text = "Box ESP",
+    Default = true
+}):AddColorPicker("EnemyBoxColor", {
+    Default = Color3.fromRGB(240, 45, 45)
+})
+EnemyBox:AddToggle("EnemyNameEsp", {
+    Text = "Name ESP",
+    Default = true
 })
 
-VisualsLeft:AddToggle("BoxESP", {
-    Text = "3D Box ESP",
-    Default = false,
-    Callback = function(val) end
-}):AddColorPicker("BoxESPColor", {
-    Default = Color3.fromRGB(255, 0, 0),
-    Callback = function(color) end
+local FriendlyBox = VisualsOverlay:AddRightGroupbox("Friendly")
+FriendlyBox:AddToggle("FriendlyBoxEsp", {
+    Text = "Box ESP",
+    Default = false
+}):AddColorPicker("FriendlyBoxColor", {
+    Default = Color3.fromRGB(45, 120, 240)
+})
+FriendlyBox:AddToggle("FriendlyNameEsp", {
+    Text = "Name ESP",
+    Default = false
 })
 
-VisualsLeft:AddDivider()
+-- 5. Settings Sub-Tabs
+local SettingsConfigs = Tabs.Settings:AddSubTab("Configurations")
+local SettingsTheme = Tabs.Settings:AddSubTab("Theme")
+local SettingsAdvanced = Tabs.Settings:AddSubTab("Advanced")
 
-VisualsLeft:AddInput("SearchPlayer", {
-    Text = "Filter by username",
-    Default = "",
-    Placeholder = "Enter username...",
-    Callback = function(val)
-        Library:Notify("Filtering players by: " .. val)
-    end
-})
+-- Populate Settings > Theme
+Library.ThemeManager:ApplyToTab(SettingsTheme)
 
--- 3. Settings Tab Controls
-local MenuGroup = Tabs.Settings:AddLeftGroupbox("Menu Utilities")
+-- Populate Settings > Configurations
+Library.SaveManager:BuildConfigSection(SettingsConfigs)
 
+-- Menu Utilities on Settings > Advanced
+local MenuGroup = SettingsAdvanced:AddLeftGroupbox("Menu Utilities")
 MenuGroup:AddButton("Unload Entire Script", function()
     Library:Notify("Unloading UI in 1.5 seconds...")
     task.wait(1.5)
@@ -151,7 +153,6 @@ MenuGroup:AddLabel("Toggle Menu UI key"):AddKeyPicker("MenuToggleKey", {
     end
 })
 
--- Watermark Toggle
 local WatermarkState = true
 MenuGroup:AddToggle("WatermarkToggle", {
     Text = "Show Performance Watermark",
@@ -161,10 +162,6 @@ MenuGroup:AddToggle("WatermarkToggle", {
     end
 })
 
-Library.ThemeManager:ApplyToTab(Tabs.Settings)
-Library.SaveManager:BuildConfigSection(Tabs.Settings)
-
 -- Initialize notifications
-Library:Notify("Aimware Retro loaded successfully!", 4)
+Library:Notify("Aimware v5 Replica Loaded!", 4)
 Library:Notify("Press [End] to toggle the main menu visibility.", 6)
-Library:Notify("Minimize the menu using the [-] button on the top-right.", 8)
