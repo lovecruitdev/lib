@@ -383,21 +383,44 @@ function Library:CreateWindow(config)
     
     MakeDraggable(TopBar, WindowFrame)
     
-    -- Logo at the top-left (Aimware white circular crosshair logo)
+    -- Logo at the top-left (Aimware white circular crosshair logo drawn with vector shapes)
     local LogoFrame = Instance.new("Frame")
-    LogoFrame.Size = UDim2.new(0, 30, 0, 30)
-    LogoFrame.Position = UDim2.new(0, 10, 0.5, -15)
+    LogoFrame.Size = UDim2.new(0, 24, 0, 24)
+    LogoFrame.Position = UDim2.new(0, 12, 0.5, -12)
     LogoFrame.BackgroundTransparency = 1
     LogoFrame.Parent = TopBar
     
-    local LogoLabel = Instance.new("TextLabel")
-    LogoLabel.Size = UDim2.new(1, 0, 1, 0)
-    LogoLabel.BackgroundTransparency = 1
-    LogoLabel.Text = "⌖" -- Crosshair symbol
-    LogoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    LogoLabel.TextSize = 22
-    LogoLabel.Font = Library.Theme.FontBold
-    LogoLabel.Parent = LogoFrame
+    -- Outer Circle
+    local OuterCircle = Instance.new("Frame")
+    OuterCircle.Size = UDim2.new(0, 16, 0, 16)
+    OuterCircle.Position = UDim2.new(0.5, -8, 0.5, -8)
+    OuterCircle.BackgroundTransparency = 1
+    OuterCircle.Parent = LogoFrame
+    
+    local ocStroke = Instance.new("UIStroke")
+    ocStroke.Color = Color3.fromRGB(255, 255, 255)
+    ocStroke.Thickness = 1.5
+    ocStroke.Parent = OuterCircle
+    
+    local ocCorner = Instance.new("UICorner")
+    ocCorner.CornerRadius = UDim.new(0.5, 0)
+    ocCorner.Parent = OuterCircle
+    
+    -- Horizontal Crosshair Line
+    local HorizontalLine = Instance.new("Frame")
+    HorizontalLine.Size = UDim2.new(0, 20, 0, 1.5)
+    HorizontalLine.Position = UDim2.new(0.5, -10, 0.5, -0.75)
+    HorizontalLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    HorizontalLine.BorderSizePixel = 0
+    HorizontalLine.Parent = LogoFrame
+    
+    -- Vertical Crosshair Line
+    local VerticalLine = Instance.new("Frame")
+    VerticalLine.Size = UDim2.new(0, 1.5, 0, 20)
+    VerticalLine.Position = UDim2.new(0.5, -0.75, 0.5, -10)
+    VerticalLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    VerticalLine.BorderSizePixel = 0
+    VerticalLine.Parent = LogoFrame
     
     -- Button holder for Top Horizontal Tabs
     local ButtonHolder = Instance.new("Frame")
@@ -640,11 +663,19 @@ function Library:CreateWindow(config)
         subLayout.VerticalAlignment = Enum.VerticalAlignment.Top
         subLayout.Parent = SubTabButtonsHolder
         
+        -- Main Tab Panel to hold all its sub-tab panels
+        local TabPanel = Instance.new("Frame")
+        TabPanel.Size = UDim2.new(1, 0, 1, 0)
+        TabPanel.BackgroundTransparency = 1
+        TabPanel.Visible = false
+        TabPanel.Parent = Container
+        
         local Tab = {
             SubTabs = {},
             ActiveSubTab = nil,
             TabButton = TabButton,
-            SubTabButtonsHolder = SubTabButtonsHolder
+            SubTabButtonsHolder = SubTabButtonsHolder,
+            Panel = TabPanel
         }
         
         -- Hover styling
@@ -689,7 +720,7 @@ function Library:CreateWindow(config)
             SubPanel.Size = UDim2.new(1, 0, 1, 0)
             SubPanel.BackgroundTransparency = 1
             SubPanel.Visible = false
-            SubPanel.Parent = Container
+            SubPanel.Parent = TabPanel -- parent to TabPanel instead of Container!
             
             local LeftScroll = Instance.new("ScrollingFrame")
             LeftScroll.Size = UDim2.new(0.5, -15, 1, -20)
@@ -788,18 +819,14 @@ function Library:CreateWindow(config)
                 Window.ActiveTab.TabButton.BackgroundColor3 = Color3.fromRGB(152, 27, 30)
                 Window.ActiveTab.TabButton.BackgroundTransparency = 1
                 Window.ActiveTab.SubTabButtonsHolder.Visible = false
-                if Window.ActiveTab.ActiveSubTab then
-                    Window.ActiveTab.ActiveSubTab.Panel.Visible = false
-                end
+                Window.ActiveTab.Panel.Visible = false -- Hide old main TabPanel!
             end
             Window.ActiveTab = Tab
             TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
             TabButton.BackgroundColor3 = Color3.fromRGB(152, 27, 30) -- Dark red active
             TabButton.BackgroundTransparency = 0.5 -- slightly visible block background
             SubTabButtonsHolder.Visible = true
-            if Tab.ActiveSubTab then
-                Tab.ActiveSubTab.Panel.Visible = true
-            end
+            TabPanel.Visible = true -- Show new main TabPanel!
             CloseAllPopups()
         end
         
