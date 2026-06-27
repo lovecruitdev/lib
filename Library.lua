@@ -23,22 +23,22 @@ local Library = {
     }
 }
 
--- Roblox Asset ID Icon mapping for Midnight style sidebar
+-- Roblox Lucide Image ID mapping for Midnight style sidebar
 local IconMap = {
-    home = "rbxassetid://6015206346",
-    aimbot = "rbxassetid://6031225818",
-    combat = "rbxassetid://6031225818",
-    eye = "rbxassetid://6031154749",
-    visuals = "rbxassetid://6031154749",
-    players = "rbxassetid://6023426915",
-    items = "rbxassetid://6034853871",
-    view = "rbxassetid://6031154749",
-    hud = "rbxassetid://6034853721",
-    settings = "rbxassetid://6031280224",
-    gear = "rbxassetid://6031280224",
-    misc = "rbxassetid://6022668955",
-    cloud = "rbxassetid://6034853641",
-    folder = "rbxassetid://6034853641"
+    home = "rbxassetid://10747366557",
+    aimbot = "rbxassetid://10747372867", -- crosshair
+    combat = "rbxassetid://10747372867",
+    eye = "rbxassetid://10747375253", -- eye
+    visuals = "rbxassetid://10747375253",
+    players = "rbxassetid://10747373865", -- user
+    items = "rbxassetid://10734947936", -- package/box
+    view = "rbxassetid://10747375253",
+    hud = "rbxassetid://10747373179", -- layout grid
+    settings = "rbxassetid://10747383921", -- settings gear
+    gear = "rbxassetid://10747383921",
+    misc = "rbxassetid://10747373111", -- wrench
+    cloud = "rbxassetid://10747384196", -- cloud
+    folder = "rbxassetid://10734953337"
 }
 
 -- Safe Font Resolver prioritizing Gotham
@@ -533,14 +533,14 @@ function Library:CreateWindow(config)
     local SearchIcon = Instance.new("ImageLabel")
     SearchIcon.Size = UDim2.new(0, 14, 0, 14)
     SearchIcon.BackgroundTransparency = 1
-    SearchIcon.Image = "rbxassetid://6031154784"
+    SearchIcon.Image = "rbxassetid://10747383791"
     SearchIcon.ImageColor3 = Color3.fromRGB(150, 155, 165)
     SearchIcon.Parent = DecoHolder
     
     local SettingsIcon = Instance.new("ImageLabel")
     SettingsIcon.Size = UDim2.new(0, 14, 0, 14)
     SettingsIcon.BackgroundTransparency = 1
-    SettingsIcon.Image = "rbxassetid://6031280224"
+    SettingsIcon.Image = "rbxassetid://10747383921"
     SettingsIcon.ImageColor3 = Color3.fromRGB(150, 155, 165)
     SettingsIcon.Parent = DecoHolder
     
