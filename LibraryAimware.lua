@@ -351,6 +351,7 @@ end
 function Library:CreateWindow(config)
     config = config or {}
     local titleText = config.Title or "V5 DEV for Counter-Strike: Global Offensive"
+    local CreateGroupbox
     
     local WindowFrame = Instance.new("Frame")
     WindowFrame.Size = UDim2.new(0, 750, 0, 520)
@@ -812,7 +813,7 @@ function Library:CreateWindow(config)
         return Tab
     end
     
-    local function CreateGroupbox(title, parentScroll)
+    function CreateGroupbox(title, parentScroll)
         local gb = Instance.new("Frame")
         gb.Size = UDim2.new(1, -6, 0, 40)
         gb.BackgroundColor3 = Library.Theme.Groupbox
