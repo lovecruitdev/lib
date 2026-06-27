@@ -1,10 +1,6 @@
--- [[ TEST SCRIPT FOR ANTIGRAVITY PREMIUM TOP-TIER GUI ]] --
--- Run this inside your Roblox Executor to preview the upgraded GUI.
--- Ensure Library.lua is located in your executor's workspace folder or readfile path.
-
+-- [[ TEST SCRIPT FOR ANTIGRAVITY MIDNIGHT 1:1 REPLICATION ]] --
 local Library
 local success, err = pcall(function()
-    -- Force load online from GitHub with cache bypass to prevent executor caching issues
     Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/lovecruitdev/lib/main/Library.lua?t=" .. os.time()))()
 end)
 
@@ -26,146 +22,67 @@ end
 
 -- Create the main window
 local Window = Library:CreateWindow({
-    Title = "Antigravity Premium v2.5 | Top-Tier Interface",
+    Title = "MIDNIGHT",
     Center = true
 })
 
 -- Enable the performance stats watermark
 Library:SetWatermarkVisibility(true)
 
--- Create tabs
-local Tabs = {
-    Main = Window:AddTab("Main Controls", "home"),
-    Visuals = Window:AddTab("Visuals", "eye"),
-    Settings = Window:AddTab("Settings", "settings")
-}
+-- Create tabs in their respective sections
+-- Signature: Window:AddTab(tabName, icon, sectionName)
+local CombatTab = Window:AddTab("Aimbot", "combat", "Combat")
 
--- 1. Main Tab Controls
-local MainBox = Tabs.Main:AddLeftGroupbox("Feature Toggles")
+local PlayersTab = Window:AddTab("Players", "eye", "Visuals")
+local ItemsTab = Window:AddTab("Items", "eye", "Visuals")
+local ViewTab = Window:AddTab("View", "eye", "Visuals")
+local HudTab = Window:AddTab("Hud", "eye", "Visuals")
 
-MainBox:AddToggle("GodMode", {
-    Text = "Enable Godmode",
-    Default = false,
-    Callback = function(val)
-        Library:Notify("Godmode state: " .. tostring(val))
-    end
+local MainTab = Window:AddTab("Main", "settings", "Misc")
+local InventoryTab = Window:AddTab("Inventory", "settings", "Misc")
+local CloudTab = Window:AddTab("Cloud", "settings", "Misc")
+
+-- 1. Aimbot Controls
+local AimbotBox = CombatTab:AddLeftGroupbox("Aimbot Controls")
+AimbotBox:AddToggle("AimbotEnable", { Text = "Enable Aimbot", Default = false })
+
+-- 2. Players Tab Controls (Sub-Tabs: Enemies / Teammates)
+local EnemiesSub = PlayersTab:AddSubTab("Enemies")
+local TeammatesSub = PlayersTab:AddSubTab("Teammates")
+
+-- Enemies ESP Sub-Tab
+local ESPPreview = EnemiesSub:AddLeftGroupbox("ESP Preview")
+ESPPreview:AddLabel("2D Box visualizer:")
+
+local Globals = EnemiesSub:AddRightGroupbox("Globals")
+Globals:AddToggle("EnableESP", { Text = "Enable", Default = true })
+Globals:AddToggle("OnlyVisible", { Text = "Only visible", Default = false })
+Globals:AddToggle("Offscreen", { Text = "Offscreen", Default = false }):AddKeyPicker("OffscreenBind", { Default = "V" })
+Globals:AddToggle("Sounds", { Text = "Sounds", Default = true })
+
+local Chams = EnemiesSub:AddRightGroupbox("Chams")
+Chams:AddToggle("VisibleChams", { Text = "Visible", Default = true }):AddColorPicker("VisColor", { Default = Color3.fromRGB(0, 162, 255) })
+Chams:AddToggle("InvisibleChams", { Text = "Invisible", Default = false }):AddColorPicker("InvisColor", { Default = Color3.fromRGB(150, 150, 150) })
+Chams:AddDropdown("ChamsType", {
+    Text = "Type",
+    Values = {"Latex", "Flat", "Textured", "Wireframe"},
+    Default = 1
 })
 
-MainBox:AddToggle("DesyncToggle", {
-    Text = "Enable Desync",
-    Default = true,
-    Callback = function(val)
-        Library:Notify("Desync state: " .. tostring(val))
-    end
-}):AddKeyPicker("DesyncBind", {
-    Default = "V",
-    SyncToggleState = true
-}):AddColorPicker("DesyncColor", {
-    Default = Color3.fromRGB(0, 255, 255),
-    Callback = function(color)
-        Library:Notify("Desync color: RGB(" .. math.round(color.R*255) .. ", " .. math.round(color.G*255) .. ", " .. math.round(color.B*255) .. ")")
-    end
-})
-
-local MainRight = Tabs.Main:AddRightGroupbox("Adjustments")
-
-MainRight:AddSlider("WalkSpeed", {
-    Text = "Walkspeed Adjust",
-    Min = 16,
-    Max = 150,
-    Default = 16,
-    Rounding = 0,
-    Callback = function(val)
-        print("WalkSpeed adjusted: " .. val)
-    end
-})
-
--- Searchable Dropdown
-MainRight:AddDropdown("AimPart", {
-    Text = "Aim target part (Searchable)",
-    Values = {"Head", "Torso", "HumanoidRootPart", "Left Arm", "Right Arm", "Left Leg", "Right Leg", "Neck", "UpperTorso", "LowerTorso"},
-    Default = 1,
-    Multi = false,
-    Callback = function(val)
-        Library:Notify("Aim target set to: " .. val)
-    end
-})
-
-MainRight:AddDropdown("TargetPlayers", {
-    Text = "Target Player Teams (Multi)",
-    Values = {"Enemies", "Friends", "Neutral", "Admins", "VIPs", "Guests"},
-    Default = {"Enemies"},
-    Multi = true,
-    Callback = function(tbl)
-        local selected = {}
-        for k, v in pairs(tbl) do
-            if v then table.insert(selected, k) end
-        end
-        Library:Notify("Target teams: " .. table.concat(selected, ", "))
-    end
-})
-
--- 2. Visuals Tab Controls
-local VisualsLeft = Tabs.Visuals:AddLeftGroupbox("ESP Config")
-
-VisualsLeft:AddToggle("PlayerESP", {
-    Text = "Show Players",
-    Default = false,
-    Callback = function(val)
-        Library:Notify("Player ESP: " .. tostring(val))
-    end
-})
-
-VisualsLeft:AddToggle("BoxESP", {
-    Text = "3D Box ESP",
-    Default = false,
-    Callback = function(val) end
-}):AddColorPicker("BoxESPColor", {
-    Default = Color3.fromRGB(255, 0, 0),
-    Callback = function(color) end
-})
-
-VisualsLeft:AddDivider()
-
-VisualsLeft:AddInput("SearchPlayer", {
-    Text = "Filter by username",
-    Default = "",
-    Placeholder = "Enter username...",
-    Callback = function(val)
-        Library:Notify("Filtering players by: " .. val)
-    end
-})
-
--- 3. Settings Tab Controls
-local MenuGroup = Tabs.Settings:AddLeftGroupbox("Menu Utilities")
-
+-- 3. Settings (Main Tab)
+local MenuGroup = MainTab:AddLeftGroupbox("Menu Utilities")
 MenuGroup:AddButton("Unload Entire Script", function()
-    Library:Notify("Unloading UI in 1.5 seconds...")
-    task.wait(1.5)
     Library:Unload()
 end)
 
-MenuGroup:AddLabel("Toggle Menu UI key"):AddKeyPicker("MenuToggleKey", {
+MenuGroup:AddLabel("Toggle Menu Key"):AddKeyPicker("MenuToggleKey", {
     Default = "End",
     Callback = function()
-        Library:Notify("Menu visibility toggled via keybind!")
+        Library:Notify("Menu visibility toggled!")
     end
 })
 
--- Watermark Toggle
-local WatermarkState = true
-MenuGroup:AddToggle("WatermarkToggle", {
-    Text = "Show Performance Watermark",
-    Default = true,
-    Callback = function(val)
-        Library:SetWatermarkVisibility(val)
-    end
-})
+Library.ThemeManager:ApplyToTab(MainTab)
+Library.SaveManager:BuildConfigSection(MainTab)
 
-Library.ThemeManager:ApplyToTab(Tabs.Settings)
-Library.SaveManager:BuildConfigSection(Tabs.Settings)
-
--- Initialize notifications
-Library:Notify("Antigravity Premium loaded successfully!", 4)
-Library:Notify("Press [End] to toggle the main menu visibility.", 6)
-Library:Notify("Minimize the menu using the [-] button on the top-right.", 8)
+Library:Notify("Midnight UI replicated successfully!", 4)

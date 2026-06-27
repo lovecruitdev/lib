@@ -350,91 +350,191 @@ end
 -- MainWindow construction (Midnight style glassmorphic layout)
 function Library:CreateWindow(config)
     config = config or {}
-    local titleText = config.Title or "midnight"
+    local titleText = config.Title or "MIDNIGHT"
+    local CreateGroupbox
     
     local WindowFrame = Instance.new("Frame")
-    WindowFrame.Size = UDim2.new(0, 680, 0, 480)
-    WindowFrame.Position = UDim2.new(0.5, -340, 0.5, -240)
-    WindowFrame.BackgroundColor3 = Library.Theme.Background
+    WindowFrame.Size = UDim2.new(0, 720, 0, 520)
+    WindowFrame.Position = UDim2.new(0.5, -360, 0.5, -260)
+    WindowFrame.BackgroundColor3 = Color3.fromRGB(12, 13, 18) -- `#0c0d12` main background
     WindowFrame.BorderSizePixel = 0
     WindowFrame.ClipsDescendants = true
     WindowFrame.Parent = TrackInstance(ScreenGui)
     
     local wCorner = Instance.new("UICorner")
-    wCorner.CornerRadius = UDim.new(0, 3) -- Sharp 3px corners
+    wCorner.CornerRadius = UDim.new(0, 4) -- 4px corner rounding
     wCorner.Parent = WindowFrame
     
     local wStroke = Instance.new("UIStroke")
-    wStroke.Color = Library.Theme.Border
+    wStroke.Color = Color3.fromRGB(29, 32, 40) -- `#1d2028` border
     wStroke.Thickness = 1
     wStroke.Parent = WindowFrame
     
-    -- Narrow, clean icons-only sidebar on the left (55px wide, full height)
+    -- Wide Sidebar on the left (160px wide, full height)
     local Sidebar = Instance.new("Frame")
     Sidebar.Position = UDim2.new(0, 0, 0, 0)
-    Sidebar.Size = UDim2.new(0, 55, 1, 0)
-    Sidebar.BackgroundColor3 = Library.Theme.Sidebar
+    Sidebar.Size = UDim2.new(0, 160, 1, 0)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(8, 8, 10) -- `#08080a` sidebar background
     Sidebar.BorderSizePixel = 0
     Sidebar.Parent = WindowFrame
     
     local SideSep = Instance.new("Frame")
     SideSep.Position = UDim2.new(1, -1, 0, 0)
     SideSep.Size = UDim2.new(0, 1, 1, 0)
-    SideSep.BackgroundColor3 = Library.Theme.Border
+    SideSep.BackgroundColor3 = Color3.fromRGB(29, 32, 40)
     SideSep.BorderSizePixel = 0
     SideSep.Parent = Sidebar
     
-    -- Styled Crescent Moon Logo for Midnight
+    -- Logo Frame at the top-left
+    local LogoFrame = Instance.new("Frame")
+    LogoFrame.Size = UDim2.new(1, 0, 0, 50)
+    LogoFrame.Position = UDim2.new(0, 0, 0, 0)
+    LogoFrame.BackgroundTransparency = 1
+    LogoFrame.Parent = Sidebar
+    
+    -- Midnight logo (pyramid style triangle)
     local LogoLabel = Instance.new("TextLabel")
-    LogoLabel.Size = UDim2.new(1, 0, 0, 50)
-    LogoLabel.Position = UDim2.new(0, 0, 0, 0)
+    LogoLabel.Size = UDim2.new(0, 24, 1, 0)
+    LogoLabel.Position = UDim2.new(0, 16, 0, 0)
     LogoLabel.BackgroundTransparency = 1
-    LogoLabel.Text = "🌙"
-    LogoLabel.TextColor3 = Library.Theme.Accent
-    LogoLabel.TextSize = 20
+    LogoLabel.Text = "▲"
+    LogoLabel.TextColor3 = Library.Theme.Accent -- neon blue
+    LogoLabel.TextSize = 16
     LogoLabel.Font = Library.Theme.FontBold
-    LogoLabel.Parent = Sidebar
+    LogoLabel.Parent = LogoFrame
     RegisterAccent(LogoLabel, "TextColor3")
     
-    -- Button holder inside sidebar (below logo)
-    local ButtonHolder = Instance.new("Frame")
+    local LogoText = Instance.new("TextLabel")
+    LogoText.Size = UDim2.new(1, -45, 1, 0)
+    LogoText.Position = UDim2.new(0, 40, 0, 0)
+    LogoText.BackgroundTransparency = 1
+    LogoText.Text = "MIDNIGHT"
+    LogoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    LogoText.TextSize = 13
+    LogoText.Font = Library.Theme.FontBold
+    LogoText.TextXAlignment = Enum.TextXAlignment.Left
+    LogoText.Parent = LogoFrame
+    
+    -- Scrollable button holder inside sidebar
+    local ButtonHolder = Instance.new("ScrollingFrame")
     ButtonHolder.Position = UDim2.new(0, 0, 0, 50)
     ButtonHolder.Size = UDim2.new(1, 0, 1, -50)
     ButtonHolder.BackgroundTransparency = 1
+    ButtonHolder.BorderSizePixel = 0
+    ButtonHolder.ScrollBarThickness = 0
     ButtonHolder.Parent = Sidebar
     
     local SideLayout = Instance.new("UIListLayout")
-    SideLayout.Padding = UDim.new(0, 10)
+    SideLayout.Padding = UDim.new(0, 12)
     SideLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     SideLayout.VerticalAlignment = Enum.VerticalAlignment.Top
     SideLayout.Parent = ButtonHolder
     
+    -- Pre-create three section containers (Combat, Visuals, Misc)
+    local SectionContainers = {}
+    local function CreateSection(name)
+        local secFrame = Instance.new("Frame")
+        secFrame.Size = UDim2.new(1, 0, 0, 0)
+        secFrame.BackgroundTransparency = 1
+        secFrame.Visible = false
+        secFrame.Parent = ButtonHolder
+        
+        local secLayout = Instance.new("UIListLayout")
+        secLayout.Padding = UDim.new(0, 4)
+        secLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        secLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+        secLayout.Parent = secFrame
+        
+        secLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            secFrame.Size = UDim2.new(1, 0, 0, secLayout.AbsoluteContentSize.Y)
+        end)
+        
+        local secLabel = Instance.new("TextLabel")
+        secLabel.Size = UDim2.new(1, -28, 0, 18)
+        secLabel.BackgroundTransparency = 1
+        secLabel.Text = name
+        secLabel.TextColor3 = Color3.fromRGB(90, 95, 105) -- `#5a5f69`
+        secLabel.Font = Library.Theme.FontBold
+        secLabel.TextSize = 10
+        secLabel.TextXAlignment = Enum.TextXAlignment.Left
+        secLabel.Parent = secFrame
+        
+        local buttonList = Instance.new("Frame")
+        buttonList.Size = UDim2.new(1, 0, 0, 0)
+        buttonList.BackgroundTransparency = 1
+        buttonList.Parent = secFrame
+        
+        local listLayout = Instance.new("UIListLayout")
+        listLayout.Padding = UDim.new(0, 4)
+        listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        listLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+        listLayout.Parent = buttonList
+        
+        listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            buttonList.Size = UDim2.new(1, 0, 0, listLayout.AbsoluteContentSize.Y)
+        end)
+        
+        SectionContainers[name] = buttonList
+    end
+    
+    CreateSection("Combat")
+    CreateSection("Visuals")
+    CreateSection("Misc")
+    
     -- Main container on the right
     local Container = Instance.new("Frame")
-    Container.Position = UDim2.new(0, 55, 0, 0)
-    Container.Size = UDim2.new(1, -55, 1, 0)
+    Container.Position = UDim2.new(0, 160, 0, 0)
+    Container.Size = UDim2.new(1, -160, 1, 0)
     Container.BackgroundTransparency = 1
     Container.Parent = WindowFrame
     
+    -- TopBar of the main container (holds horizontal sub-tabs and decorations)
     local TopBar = Instance.new("Frame")
-    TopBar.Size = UDim2.new(1, 0, 0, 40)
+    TopBar.Size = UDim2.new(1, 0, 0, 45)
     TopBar.BackgroundTransparency = 1
     TopBar.Parent = Container
     
     MakeDraggable(TopBar, WindowFrame)
     
-    local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Position = UDim2.new(0, 16, 0, 0)
-    TitleLabel.Size = UDim2.new(0.6, 0, 1, 0)
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Text = titleText:lower()
-    TitleLabel.TextColor3 = Library.Theme.Text
-    TitleLabel.Font = Library.Theme.FontBold
-    TitleLabel.TextSize = 13
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TitleLabel.Parent = TopBar
+    -- Holder for Horizontal Sub-Tabs in the top bar
+    local SubTabButtonsHolderFrame = Instance.new("Frame")
+    SubTabButtonsHolderFrame.Position = UDim2.new(0, 16, 0, 0)
+    SubTabButtonsHolderFrame.Size = UDim2.new(0.65, 0, 1, 0)
+    SubTabButtonsHolderFrame.BackgroundTransparency = 1
+    SubTabButtonsHolderFrame.Name = "SubTabButtonsHolder"
+    SubTabButtonsHolderFrame.Parent = TopBar
     
-    -- macOS style close/min buttons
+    -- Decorative Search and Settings icons on the top-right
+    local DecoHolder = Instance.new("Frame")
+    DecoHolder.Size = UDim2.new(0, 60, 1, 0)
+    DecoHolder.Position = UDim2.new(1, -70, 0, 0)
+    DecoHolder.BackgroundTransparency = 1
+    DecoHolder.Parent = TopBar
+    
+    local DecoLayout = Instance.new("UIListLayout")
+    DecoLayout.FillDirection = Enum.FillDirection.Horizontal
+    DecoLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+    DecoLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    DecoLayout.Padding = UDim.new(0, 12)
+    DecoLayout.Parent = DecoHolder
+    
+    local SearchIcon = Instance.new("TextLabel")
+    SearchIcon.Size = UDim2.new(0, 16, 0, 16)
+    SearchIcon.BackgroundTransparency = 1
+    SearchIcon.Text = "🔍"
+    SearchIcon.TextColor3 = Color3.fromRGB(150, 155, 165)
+    SearchIcon.TextSize = 12
+    SearchIcon.Parent = DecoHolder
+    
+    local SettingsIcon = Instance.new("TextLabel")
+    SettingsIcon.Size = UDim2.new(0, 16, 0, 16)
+    SettingsIcon.BackgroundTransparency = 1
+    SettingsIcon.Text = "⚙️"
+    SettingsIcon.TextColor3 = Color3.fromRGB(150, 155, 165)
+    SettingsIcon.TextSize = 12
+    SettingsIcon.Parent = DecoHolder
+    
+    -- top-right close/minimize buttons (macOS style circle style for Midnight)
     local ControlFrame = Instance.new("Frame")
     ControlFrame.Position = UDim2.new(1, -55, 0, 0)
     ControlFrame.Size = UDim2.new(0, 45, 1, 0)
@@ -473,22 +573,15 @@ function Library:CreateWindow(config)
         Minimized = not Minimized
         CloseAllPopups()
         if Minimized then
-            Tween(WindowFrame, 0.2, {Size = UDim2.new(0, 680, 0, 40)})
+            Tween(WindowFrame, 0.2, {Size = UDim2.new(0, 720, 0, 45)})
         else
-            Tween(WindowFrame, 0.2, {Size = UDim2.new(0, 680, 0, 480)})
+            Tween(WindowFrame, 0.2, {Size = UDim2.new(0, 720, 0, 520)})
         end
     end)
     
     CloseButton.MouseButton1Click:Connect(function()
         Library:Unload()
     end)
-    
-    local Sep = Instance.new("Frame")
-    Sep.Position = UDim2.new(0, 0, 1, -1)
-    Sep.Size = UDim2.new(1, 0, 0, 1)
-    Sep.BackgroundColor3 = Library.Theme.Border
-    Sep.BorderSizePixel = 0
-    Sep.Parent = TopBar
     
     local Window = {
         Tabs = {},
@@ -504,107 +597,221 @@ function Library:CreateWindow(config)
         end
     end)
     
-    function Window:AddTab(tabName, icon)
+    function Window:AddTab(tabName, icon, sectionName)
         local tabIndex = #Window.Tabs + 1
         
-        -- Icons-only tab button
+        -- Auto-group tabs if section name is not specified
+        if not sectionName then
+            local lowerName = tabName:lower()
+            if string.find(lowerName, "aim") or string.find(lowerName, "combat") or string.find(lowerName, "legit") or string.find(lowerName, "rage") or string.find(lowerName, "main") then
+                sectionName = "Combat"
+            elseif string.find(lowerName, "visual") or string.find(lowerName, "esp") or string.find(lowerName, "player") or string.find(lowerName, "item") or string.find(lowerName, "view") or string.find(lowerName, "hud") then
+                sectionName = "Visuals"
+            else
+                sectionName = "Misc"
+            end
+        end
+        
+        -- Make the section container visible
+        local parentSection = SectionContainers[sectionName] or SectionContainers["Misc"]
+        parentSection.Parent.Visible = true
+        
+        -- Wide tab button
         local TabButton = Instance.new("TextButton")
-        TabButton.Size = UDim2.new(0, 36, 0, 36)
-        TabButton.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+        TabButton.Size = UDim2.new(1, -20, 0, 32)
+        TabButton.BackgroundColor3 = Color3.fromRGB(19, 21, 28)
         TabButton.BackgroundTransparency = 1
         TabButton.BorderSizePixel = 0
-        TabButton.Text = IconMap[icon:lower()] or IconMap[tabName:lower()] or "🎯"
-        TabButton.TextColor3 = Library.Theme.TextMuted
+        
+        local cleanIcon = IconMap[icon:lower()] or IconMap[tabName:lower()] or "🎯"
+        TabButton.Text = "     " .. cleanIcon .. "   " .. tabName
+        TabButton.TextColor3 = Color3.fromRGB(120, 125, 135) -- `#787d87`
         TabButton.Font = Library.Theme.FontBold
-        TabButton.TextSize = 16
-        TabButton.Parent = ButtonHolder
+        TabButton.TextSize = 11
+        TabButton.TextXAlignment = Enum.TextXAlignment.Left
+        TabButton.Parent = parentSection
         
         local tbCorner = Instance.new("UICorner")
-        tbCorner.CornerRadius = UDim.new(0, 3)
+        tbCorner.CornerRadius = UDim.new(0, 4)
         tbCorner.Parent = TabButton
         
-        -- Active Left Border Indicator
-        local ActiveIndicator = Instance.new("Frame")
-        ActiveIndicator.Name = "ActiveIndicator"
-        ActiveIndicator.Size = UDim2.new(0, 2, 0.6, 0)
-        ActiveIndicator.Position = UDim2.new(0, 0, 0.2, 0)
-        ActiveIndicator.BackgroundColor3 = Library.Theme.Accent
-        ActiveIndicator.BorderSizePixel = 0
-        ActiveIndicator.Visible = false
-        ActiveIndicator.Parent = TabButton
-        RegisterAccent(ActiveIndicator, "BackgroundColor3")
+        -- Frame to hold horizontal sub-tab buttons in the TopBar
+        local SubTabButtonsHolder = Instance.new("Frame")
+        SubTabButtonsHolder.Size = UDim2.new(1, 0, 1, 0)
+        SubTabButtonsHolder.BackgroundTransparency = 1
+        SubTabButtonsHolder.Visible = false
+        SubTabButtonsHolder.Parent = SubTabButtonsHolderFrame
         
-        -- Hover styling
-        TabButton.MouseEnter:Connect(function()
-            if Window.ActiveTab.Button ~= TabButton then
-                Tween(TabButton, 0.1, {TextColor3 = Library.Theme.Text})
-            end
-        end)
-        TabButton.MouseLeave:Connect(function()
-            if Window.ActiveTab.Button ~= TabButton then
-                Tween(TabButton, 0.1, {TextColor3 = Library.Theme.TextMuted})
-            end
-        end)
+        local subLayout = Instance.new("UIListLayout")
+        subLayout.FillDirection = Enum.FillDirection.Horizontal
+        subLayout.Padding = UDim.new(0, 16)
+        subLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+        subLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        subLayout.Parent = SubTabButtonsHolder
         
+        -- Main Tab Panel to hold all its sub-tab panels
         local TabPanel = Instance.new("Frame")
-        TabPanel.Position = UDim2.new(0, 0, 0, 40)
-        TabPanel.Size = UDim2.new(1, 0, 1, -40)
+        TabPanel.Position = UDim2.new(0, 0, 0, 45)
+        TabPanel.Size = UDim2.new(1, 0, 1, -45)
         TabPanel.BackgroundTransparency = 1
         TabPanel.Visible = false
         TabPanel.Parent = Container
         
-        local LeftScroll = Instance.new("ScrollingFrame")
-        LeftScroll.Size = UDim2.new(0.5, -15, 1, -20)
-        LeftScroll.Position = UDim2.new(0, 10, 0, 10)
-        LeftScroll.BackgroundTransparency = 1
-        LeftScroll.BorderSizePixel = 0
-        LeftScroll.ScrollBarThickness = 3
-        LeftScroll.ScrollBarImageColor3 = Library.Theme.Border
-        LeftScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-        LeftScroll.Parent = TabPanel
+        local Tab = {
+            SubTabs = {},
+            ActiveSubTab = nil,
+            TabButton = TabButton,
+            SubTabButtonsHolder = SubTabButtonsHolder,
+            Panel = TabPanel
+        }
         
-        local LeftLayout = Instance.new("UIListLayout")
-        LeftLayout.Padding = UDim.new(0, 10)
-        LeftLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        LeftLayout.Parent = LeftScroll
-        
-        LeftLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            LeftScroll.CanvasSize = UDim2.new(0, 0, 0, LeftLayout.AbsoluteContentSize.Y + 20)
+        -- Hover styling
+        TabButton.MouseEnter:Connect(function()
+            if Window.ActiveTab ~= Tab then
+                Tween(TabButton, 0.1, {TextColor3 = Color3.fromRGB(240, 240, 240)})
+            end
+        end)
+        TabButton.MouseLeave:Connect(function()
+            if Window.ActiveTab ~= Tab then
+                Tween(TabButton, 0.1, {TextColor3 = Color3.fromRGB(120, 125, 135)})
+            end
         end)
         
-        local RightScroll = Instance.new("ScrollingFrame")
-        RightScroll.Size = UDim2.new(0.5, -15, 1, -20)
-        RightScroll.Position = UDim2.new(0.5, 5, 0, 10)
-        RightScroll.BackgroundTransparency = 1
-        RightScroll.BorderSizePixel = 0
-        RightScroll.ScrollBarThickness = 3
-        RightScroll.ScrollBarImageColor3 = Library.Theme.Border
-        RightScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-        RightScroll.Parent = TabPanel
+        function Tab:AddSubTab(subTabName)
+            local subIndex = #Tab.SubTabs + 1
+            
+            local SubTabButton = Instance.new("TextButton")
+            SubTabButton.Size = UDim2.new(0, 80, 1, 0)
+            SubTabButton.BackgroundTransparency = 1
+            SubTabButton.BorderSizePixel = 0
+            SubTabButton.Text = subTabName:upper()
+            SubTabButton.TextColor3 = Library.Theme.TextMuted
+            SubTabButton.Font = Library.Theme.FontBold
+            SubTabButton.TextSize = 11
+            SubTabButton.Parent = SubTabButtonsHolder
+            
+            -- Active Underline Indicator at the bottom of the horizontal button
+            local SubIndicator = Instance.new("Frame")
+            SubIndicator.Name = "SubIndicator"
+            SubIndicator.Size = UDim2.new(1, 0, 0, 2)
+            SubIndicator.Position = UDim2.new(0, 0, 1, -2)
+            SubIndicator.BackgroundColor3 = Library.Theme.Accent -- neon blue
+            SubIndicator.BorderSizePixel = 0
+            SubIndicator.Visible = false
+            SubIndicator.Parent = SubTabButton
+            RegisterAccent(SubIndicator, "BackgroundColor3")
+            
+            local SubPanel = Instance.new("Frame")
+            SubPanel.Size = UDim2.new(1, 0, 1, 0)
+            SubPanel.BackgroundTransparency = 1
+            SubPanel.Visible = false
+            SubPanel.Parent = TabPanel -- parent to TabPanel instead of Container!
+            
+            local LeftScroll = Instance.new("ScrollingFrame")
+            LeftScroll.Size = UDim2.new(0.5, -15, 1, -20)
+            LeftScroll.Position = UDim2.new(0, 10, 0, 10)
+            LeftScroll.BackgroundTransparency = 1
+            LeftScroll.BorderSizePixel = 0
+            LeftScroll.ScrollBarThickness = 3
+            LeftScroll.ScrollBarImageColor3 = Library.Theme.Border
+            LeftScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+            LeftScroll.Parent = SubPanel
+            
+            local LeftLayout = Instance.new("UIListLayout")
+            LeftLayout.Padding = UDim.new(0, 10)
+            LeftLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            LeftLayout.Parent = LeftScroll
+            
+            LeftLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                LeftScroll.CanvasSize = UDim2.new(0, 0, 0, LeftLayout.AbsoluteContentSize.Y + 20)
+            end)
+            
+            local RightScroll = Instance.new("ScrollingFrame")
+            RightScroll.Size = UDim2.new(0.5, -15, 1, -20)
+            RightScroll.Position = UDim2.new(0.5, 5, 0, 10)
+            RightScroll.BackgroundTransparency = 1
+            RightScroll.BorderSizePixel = 0
+            RightScroll.ScrollBarThickness = 3
+            RightScroll.ScrollBarImageColor3 = Library.Theme.Border
+            RightScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+            RightScroll.Parent = SubPanel
+            
+            local RightLayout = Instance.new("UIListLayout")
+            RightLayout.Padding = UDim.new(0, 10)
+            RightLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            RightLayout.Parent = RightScroll
+            
+            RightLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                RightScroll.CanvasSize = UDim2.new(0, 0, 0, RightLayout.AbsoluteContentSize.Y + 20)
+            end)
+            
+            local SubTab = {
+                Button = SubTabButton,
+                Panel = SubPanel,
+                LeftScroll = LeftScroll,
+                RightScroll = RightScroll
+            }
+            
+            local function ActivateSub()
+                if Tab.ActiveSubTab then
+                    Tab.ActiveSubTab.Button.TextColor3 = Library.Theme.TextMuted
+                    if Tab.ActiveSubTab.Button:FindFirstChild("SubIndicator") then
+                        Tab.ActiveSubTab.Button.SubIndicator.Visible = false
+                    end
+                    Tab.ActiveSubTab.Panel.Visible = false
+                end
+                Tab.ActiveSubTab = SubTab
+                SubTabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+                SubIndicator.Visible = true
+                SubPanel.Visible = true
+                CloseAllPopups()
+            end
+            
+            SubTabButton.MouseButton1Click:Connect(ActivateSub)
+            
+            function SubTab:AddLeftGroupbox(title)
+                return CreateGroupbox(title, LeftScroll)
+            end
+            function SubTab:AddRightGroupbox(title)
+                return CreateGroupbox(title, RightScroll)
+            end
+            
+            table.insert(Tab.SubTabs, SubTab)
+            Tab.SubTabs[subTabName] = SubTab
+            
+            task.defer(function()
+                if Tab.ActiveSubTab == nil then
+                    ActivateSub()
+                end
+            end)
+            
+            return SubTab
+        end
         
-        local RightLayout = Instance.new("UIListLayout")
-        RightLayout.Padding = UDim.new(0, 10)
-        RightLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        RightLayout.Parent = RightScroll
-        
-        RightLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            RightScroll.CanvasSize = UDim2.new(0, 0, 0, RightLayout.AbsoluteContentSize.Y + 20)
-        end)
-        
-        local Tab = {}
+        -- Backwards compatibility layout fallbacks:
+        function Tab:AddLeftGroupbox(title)
+            local defaultSub = Tab.SubTabs["General"] or Tab:AddSubTab("General")
+            return defaultSub:AddLeftGroupbox(title)
+        end
+        function Tab:AddRightGroupbox(title)
+            local defaultSub = Tab.SubTabs["General"] or Tab:AddSubTab("General")
+            return defaultSub:AddRightGroupbox(title)
+        end
         
         local function Activate()
             if Window.ActiveTab then
-                Window.ActiveTab.Button.TextColor3 = Library.Theme.TextMuted
-                if Window.ActiveTab.Button:FindFirstChild("ActiveIndicator") then
-                    Window.ActiveTab.Button.ActiveIndicator.Visible = false
-                end
-                Window.ActiveTab.Panel.Visible = false
+                Window.ActiveTab.TabButton.TextColor3 = Color3.fromRGB(120, 125, 135)
+                Window.ActiveTab.TabButton.BackgroundColor3 = Color3.fromRGB(19, 21, 28)
+                Window.ActiveTab.TabButton.BackgroundTransparency = 1
+                Window.ActiveTab.SubTabButtonsHolder.Visible = false
+                Window.ActiveTab.Panel.Visible = false -- Hide old main TabPanel!
             end
             Window.ActiveTab = Tab
-            TabButton.TextColor3 = Library.Theme.Accent
-            ActiveIndicator.Visible = true
-            TabPanel.Visible = true
+            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TabButton.BackgroundColor3 = Color3.fromRGB(19, 21, 28) -- Active dark block
+            TabButton.BackgroundTransparency = 0.5
+            SubTabButtonsHolder.Visible = true
+            TabPanel.Visible = true -- Show new main TabPanel!
             CloseAllPopups()
         end
         
@@ -614,8 +821,9 @@ function Library:CreateWindow(config)
             if not Window.ActiveTab then Activate() end
         end)
         
-        Tab.Button = TabButton
-        Tab.Panel = TabPanel
+        table.insert(Window.Tabs, Tab)
+        return Tab
+    end
         
         local function CreateGroupbox(title, parentScroll)
             local gb = Instance.new("Frame")
@@ -674,39 +882,53 @@ function Library:CreateWindow(config)
                 toggleFrame.Text = ""
                 toggleFrame.Parent = ContentArea
                 
-                -- Checkbox frame on the left
+                -- Checkbox frame on the left (sharp blue box when active)
                 local CheckboxFrame = Instance.new("Frame")
                 CheckboxFrame.Size = UDim2.new(0, 14, 0, 14)
                 CheckboxFrame.Position = UDim2.new(0, 0, 0.5, -7)
                 CheckboxFrame.BackgroundColor3 = Color3.fromRGB(16, 16, 20)
                 CheckboxFrame.BorderSizePixel = 0
                 CheckboxFrame.Parent = toggleFrame
-                CheckboxFrame:SetAttribute("IsToggle", true)
-                RegisterAccent(CheckboxFrame, "BackgroundColor3")
                 
                 local cbCorner = Instance.new("UICorner")
-                cbCorner.CornerRadius = UDim.new(0, 2) -- sharp 2px checkbox corners
+                cbCorner.CornerRadius = UDim.new(0, 3)
                 cbCorner.Parent = CheckboxFrame
                 
                 local cbStroke = Instance.new("UIStroke")
                 cbStroke.Color = Color3.fromRGB(35, 35, 45)
                 cbStroke.Thickness = 1
                 cbStroke.Parent = CheckboxFrame
-                cbStroke:SetAttribute("IsToggle", true)
-                RegisterAccent(cbStroke, "Color")
                 
-                local CheckIndicator = Instance.new("Frame")
-                CheckIndicator.Size = UDim2.new(0, 0, 0, 0)
-                CheckIndicator.Position = UDim2.new(0.5, 0, 0.5, 0)
-                CheckIndicator.AnchorPoint = Vector2.new(0.5, 0.5)
-                CheckIndicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                CheckIndicator.BorderSizePixel = 0
-                CheckIndicator.Parent = CheckboxFrame
+                local CheckLabel = Instance.new("TextLabel")
+                CheckLabel.Size = UDim2.new(1, 0, 1, 0)
+                CheckLabel.BackgroundTransparency = 1
+                CheckLabel.Text = "✓"
+                CheckLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                CheckLabel.Font = Library.Theme.FontBold
+                CheckLabel.TextSize = 12
+                CheckLabel.Visible = false
+                CheckLabel.Parent = CheckboxFrame
                 
-                local ciCorner = Instance.new("UICorner")
-                ciCorner.CornerRadius = UDim.new(0, 1)
-                ciCorner.Parent = CheckIndicator
+                local ToggleState = default
                 
+                local function SetState(val, skipCallback)
+                    ToggleState = val
+                    Library.Toggles[id] = { Value = val }
+                    
+                    if not skipCallback then
+                        pcall(callback, val)
+                    end
+                    
+                    if ToggleState then
+                        Tween(CheckboxFrame, 0.08, {BackgroundColor3 = Library.Theme.Accent})
+                        Tween(cbStroke, 0.08, {Color = Library.Theme.Accent})
+                        CheckLabel.Visible = true
+                    else
+                        Tween(CheckboxFrame, 0.08, {BackgroundColor3 = Color3.fromRGB(16, 16, 20)})
+                        Tween(cbStroke, 0.08, {Color = Color3.fromRGB(35, 35, 45)})
+                        CheckLabel.Visible = false
+                    end
+                end               
                 local label = Instance.new("TextLabel")
                 label.Position = UDim2.new(0, 22, 0, 0) -- shifted right of checkbox
                 label.Size = UDim2.new(1, -122, 1, 0) -- leave room for keybind/colorpickers on far right
@@ -732,28 +954,7 @@ function Library:CreateWindow(config)
                 RightLayout.SortOrder = Enum.SortOrder.LayoutOrder
                 RightLayout.Parent = RightControls
                 
-                local ToggleState = default
-                
-                local function SetState(val, skipCallback)
-                    ToggleState = val
-                    Library.Toggles[id] = { Value = val }
-                    CheckboxFrame:SetAttribute("Active", val)
-                    cbStroke:SetAttribute("Active", val)
-                    
-                    if not skipCallback then
-                        pcall(callback, val)
-                    end
-                    
-                    if ToggleState then
-                        Tween(CheckboxFrame, 0.1, {BackgroundColor3 = Library.Theme.Accent})
-                        Tween(cbStroke, 0.1, {Color = Library.Theme.Accent})
-                        Tween(CheckIndicator, 0.1, {Size = UDim2.new(0, 8, 0, 8)})
-                    else
-                        Tween(CheckboxFrame, 0.1, {BackgroundColor3 = Color3.fromRGB(16, 16, 20)})
-                        Tween(cbStroke, 0.1, {Color = Color3.fromRGB(35, 35, 45)})
-                        Tween(CheckIndicator, 0.1, {Size = UDim2.new(0, 0, 0, 0)})
-                    end
-                end
+
                 
                 toggleFrame.MouseButton1Click:Connect(function()
                     SetState(not ToggleState)
